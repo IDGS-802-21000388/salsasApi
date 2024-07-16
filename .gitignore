@@ -1,0 +1,30 @@
+# .gitignore para proyectos de ASP.NET Core
+
+# Ignorar la carpeta de dependencias locales
+bin/
+obj/
+
+# Ignorar configuraciones específicas de Visual Studio
+.vs/
+*.user
+*.suo
+
+# Ignorar archivos de compilación
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# Ignorar archivos generados por el entorno de desarrollo
+*.vsix
+*.vscode
+
+# Ignorar configuraciones específicas del sistema operativo
+[Tt]humbs.db
+*.DS_Store
+
+# Ignorar archivos de configuración de Rider
+.idea/
+*.sln.iml
+*.csproj.iml

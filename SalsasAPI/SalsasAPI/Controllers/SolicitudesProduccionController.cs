@@ -6,7 +6,7 @@ namespace SalsasAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SolicitudesProduccionController : Controller
+    public class SolicitudesProduccionController : ControllerBase
     {
         private readonly SalsaContext _context;
         public SolicitudesProduccionController(SalsaContext context)
@@ -34,7 +34,7 @@ namespace SalsasAPI.Controllers
                     sp.IdProducto,
                     NombreProducto = sp.IdProductoNavigation.NombreProducto,
                     sp.IdUsuario,
-                    NombreCliente = sp.DetalleSolicituds.FirstOrDefault().IdUsuarioNavigation.Nombre,
+                    NombreCliente = sp.IdUsuarioNavigation.Nombre,
                     DetalleSolicituds = sp.DetalleSolicituds.Select(ds => new
                     {
                         ds.IdDetalleSolicitud,

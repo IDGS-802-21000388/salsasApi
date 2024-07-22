@@ -6,7 +6,7 @@ namespace SalsasAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DetalleSolicitudController : Controller
+    public class DetalleSolicitudController : ControllerBase
     {
         private readonly SalsaContext _context;
         public DetalleSolicitudController(SalsaContext context)

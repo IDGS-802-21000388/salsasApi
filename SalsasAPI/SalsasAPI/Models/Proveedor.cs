@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SalsasAPI.Models;
 
@@ -17,5 +18,6 @@ public partial class Proveedor
 
     public int Estatus { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<MateriaPrima> MateriaPrimas { get; set; } = new List<MateriaPrima>();
 }

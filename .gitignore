@@ -28,3 +28,6 @@ obj/
 .idea/
 *.sln.iml
 *.csproj.iml
+
+# Ignorar el archivo de configuración appsettings.json
+SalsasAPI/SalsasAPI/appsettings.json

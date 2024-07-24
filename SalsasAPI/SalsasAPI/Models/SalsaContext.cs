@@ -58,6 +58,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<SolicitudProduccion> SolicitudProduccions { get; set; }
 
     public virtual DbSet<Tarjetum> Tarjeta { get; set; }
+    public virtual DbSet<Direccion> Direccion { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
@@ -598,6 +599,48 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK__Tarjeta__idPago__1BC821DD");
         });
 
+        modelBuilder.Entity<Direccion>(entity =>
+        {
+            entity.HasKey(e => e.IdDireccion).HasName("PK__Direccion__645723A6D661BB22");
+
+            entity.ToTable("Direccion");
+
+            entity.Property(e => e.IdDireccion).HasColumnName("idDireccion");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("estado");
+            entity.Property(e => e.Municipio)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("municipio");
+            entity.Property(e => e.CodigoPostal)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("codigoPostal");
+            entity.Property(e => e.Colonia)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("colonia");
+            entity.Property(e => e.Calle)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("calle");
+            entity.Property(e => e.NumExt)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("numExt");
+            entity.Property(e => e.NumInt)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("numInt");
+            entity.Property(e => e.Referencia)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("referencia");
+        });
+
+
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.HasKey(e => e.IdUsuario).HasName("PK__Usuario__645723A6C661BB22");
@@ -641,7 +684,16 @@ public partial class SalsaContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValue("")
                 .HasColumnName("telefono");
+            entity.Property(e => e.IdDireccion)
+                .HasColumnName("idDireccion");
+
+            entity.HasOne(d => d.Direccion)
+                .WithOne()
+                .HasForeignKey<Usuario>(d => d.IdDireccion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Usuario_Direccion");
         });
+
 
         modelBuilder.Entity<EnvioDetalle>(eb =>
         {

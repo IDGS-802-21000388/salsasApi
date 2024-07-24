@@ -23,7 +23,11 @@ public partial class Usuario
 
     public int Intentos { get; set; }
 
+    public int IdDireccion { get; set; }
+
     public DateTime? DateLastToken { get; set; }
+
+    public virtual Direccion Direccion { get; set; } = null!;
     [JsonIgnore]
     public virtual ICollection<DetalleSolicitud> DetalleSolicituds { get; set; } = new List<DetalleSolicitud>();
     [JsonIgnore]

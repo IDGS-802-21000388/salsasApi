@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SalsasAPI.Models;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalsasAPI.Controllers
 {
@@ -40,8 +43,25 @@ namespace SalsasAPI.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
+            // Crear y guardar la dirección
+            var direccion = new Direccion
+            {
+                Estado = registerRequest.Direccion.Estado,
+                Municipio = registerRequest.Direccion.Municipio,
+                CodigoPostal = registerRequest.Direccion.CodigoPostal,
+                Colonia = registerRequest.Direccion.Colonia,
+                Calle = registerRequest.Direccion.Calle,
+                NumExt = registerRequest.Direccion.NumExt,
+                NumInt = registerRequest.Direccion.NumInt,
+                Referencia = registerRequest.Direccion.Referencia
+            };
+
+            _context.Direccion.Add(direccion);
+            await _context.SaveChangesAsync();
+
+            // Crear y guardar el usuario con el ID de la dirección
             var user = new Usuario
             {
                 Nombre = registerRequest.Nombre,
@@ -51,28 +71,42 @@ namespace SalsasAPI.Controllers
                 Telefono = registerRequest.Telefono,
                 Rol = "cliente",
                 Estatus = 1,
-                Intentos = 0
+                Intentos = 0,
+                IdDireccion = direccion.IdDireccion
             };
 
             _context.Usuarios.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(new { Message = "User registered successfully", User = user });
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Correo { get; set; } = null!;
-        public string Contrasenia { get; set; } = null!;
-    }
+        public class LoginRequest
+        {
+            public string Correo { get; set; } = null!;
+            public string Contrasenia { get; set; } = null!;
+        }
 
-    public class RegisterRequest
-    {
-        public string Nombre { get; set; } = null!;
-        public string NombreUsuario { get; set; } = null!;
-        public string Correo { get; set; } = null!;
-        public string Contrasenia { get; set; } = null!;
-        public string Telefono { get; set; } = null!;
+        public class RegisterRequest
+        {
+            public string Nombre { get; set; } = null!;
+            public string NombreUsuario { get; set; } = null!;
+            public string Correo { get; set; } = null!;
+            public string Contrasenia { get; set; } = null!;
+            public string Telefono { get; set; } = null!;
+            public DireccionRequest Direccion { get; set; } = null!;
+        }
+
+        public class DireccionRequest
+        {
+            public string Estado { get; set; } = null!;
+            public string Municipio { get; set; } = null!;
+            public string CodigoPostal { get; set; } = null!;
+            public string Colonia { get; set; } = null!;
+            public string Calle { get; set; } = null!;
+            public string NumExt { get; set; } = null!;
+            public string? NumInt { get; set; }
+            public string? Referencia { get; set; }
+        }
     }
 }

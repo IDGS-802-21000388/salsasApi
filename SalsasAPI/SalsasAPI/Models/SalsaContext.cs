@@ -58,14 +58,17 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<SolicitudProduccion> SolicitudProduccions { get; set; }
 
     public virtual DbSet<Tarjetum> Tarjeta { get; set; }
+    public virtual DbSet<Direccion> Direccion { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     public virtual DbSet<Ventum> Venta { get; set; }
 
+    public virtual DbSet<EnvioDetalle> EnvioDetalles { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02; Initial Catalog=Salsas; user id=sa; password=root;TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -596,6 +599,48 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK__Tarjeta__idPago__1BC821DD");
         });
 
+        modelBuilder.Entity<Direccion>(entity =>
+        {
+            entity.HasKey(e => e.IdDireccion).HasName("PK__Direccion__645723A6D661BB22");
+
+            entity.ToTable("Direccion");
+
+            entity.Property(e => e.IdDireccion).HasColumnName("idDireccion");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("estado");
+            entity.Property(e => e.Municipio)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("municipio");
+            entity.Property(e => e.CodigoPostal)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("codigoPostal");
+            entity.Property(e => e.Colonia)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("colonia");
+            entity.Property(e => e.Calle)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("calle");
+            entity.Property(e => e.NumExt)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("numExt");
+            entity.Property(e => e.NumInt)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("numInt");
+            entity.Property(e => e.Referencia)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("referencia");
+        });
+
+
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.HasKey(e => e.IdUsuario).HasName("PK__Usuario__645723A6C661BB22");
@@ -603,6 +648,11 @@ public partial class SalsaContext : DbContext
             entity.ToTable("Usuario");
 
             entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.Correo)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasDefaultValue("")
+                .HasColumnName("correo");
             entity.Property(e => e.Contrasenia)
                 .HasMaxLength(200)
                 .IsUnicode(false)
@@ -634,6 +684,31 @@ public partial class SalsaContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValue("")
                 .HasColumnName("telefono");
+            entity.Property(e => e.IdDireccion)
+                .HasColumnName("idDireccion");
+
+            entity.HasOne(d => d.Direccion)
+                .WithOne()
+                .HasForeignKey<Usuario>(d => d.IdDireccion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Usuario_Direccion");
+        });
+
+
+        modelBuilder.Entity<EnvioDetalle>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("vw_Envio_Detalles");
+            eb.Property(v => v.IdEnvio).HasColumnName("idEnvio");
+            eb.Property(v => v.EstatusPedido).HasColumnName("EstatusPedido");
+            eb.Property(v => v.FechaEnvio).HasColumnName("fechaEnvio");
+            eb.Property(v => v.FechaEntregaEstimada).HasColumnName("fechaEntregaEstimada");
+            eb.Property(v => v.EstatusEnvio).HasColumnName("estatusEnvio");
+            eb.Property(v => v.NombrePaqueteria).HasColumnName("nombrePaqueteria");
+            eb.Property(v => v.NombreCliente).HasColumnName("nombreCliente");
+            eb.Property(v => v.NombreProducto).HasColumnName("nombreProducto");
+            eb.Property(v => v.Domicilio).HasColumnName("domicilio");
+            eb.Property(v => v.Total).HasColumnName("total");
         });
 
         modelBuilder.Entity<Ventum>(entity =>

@@ -1,13 +1,18 @@
-﻿public class EnvioDetalle
+﻿using System;
+using System.Collections.Generic;
+
+namespace SalsasAPI.Models;
+public class EnvioDetalle
 {
     public int IdEnvio { get; set; }
     public int EstatusPedido { get; set; }
-    public string FechaEnvio { get; set; }
-    public string FechaEntregaEstimada { get; set; }
-    public string EstatusEnvio { get; set; }
-    public string NombrePaqueteria { get; set; }
-    public string NombreCliente { get; set; }
-    public string NombreProducto { get; set; }
-    public string Domicilio { get; set; }
-    public string Total { get; set; }
+    public string FechaEnvio { get; set; } = null!;
+    public string FechaEntregaEstimada { get; set; } = null!;
+    public string EstatusEnvio { get; set; } = null!;
+    public string NombrePaqueteria { get; set; } = null!;
+    public string NombreCliente { get; set; } = null!;
+    public string NombreProducto { get; set; } = null!;
+    public string Domicilio { get; set; } = null!;
+    public double Total { get; set; }
 }
+

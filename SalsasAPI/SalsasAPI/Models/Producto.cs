@@ -30,8 +30,10 @@ public partial class Producto
     public virtual ICollection<Merma> Mermas { get; set; } = new List<Merma>();
     [JsonIgnore]
     public virtual ICollection<PasoReceta> PasoReceta { get; set; } = new List<PasoReceta>();
+    [JsonIgnore]
 
     public virtual ICollection<Recetum> Receta { get; set; } = new List<Recetum>();
+    [JsonIgnore]
 
     public virtual ICollection<SolicitudProduccion> SolicitudProduccions { get; set; } = new List<SolicitudProduccion>();
 }

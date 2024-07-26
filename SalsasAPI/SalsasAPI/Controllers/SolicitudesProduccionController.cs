@@ -56,6 +56,17 @@ namespace SalsasAPI.Controllers
             return Ok(solicitudProduccion);
         }
 
+        // POST: api/solicitudproduccion
+        [HttpPost]
+        public async Task<ActionResult<SolicitudProduccion>> PostSolicitudProduccion(SolicitudProduccion solicitudProduccion)
+        {
+            _context.SolicitudProduccions.Add(solicitudProduccion);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetSolicitudProduccion), new { id = solicitudProduccion.IdSolicitud }, solicitudProduccion);
+        }
+
+
         [HttpPut("{id}/estatus")]
         public async Task<IActionResult> UpdateSolicitudProduccionEstatus(int id, [FromBody] int estatus)
         {

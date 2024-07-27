@@ -68,7 +68,7 @@ public partial class SalsaContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02; Initial Catalog=Salsas; user id=sa; password=root;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,7 +79,7 @@ public partial class SalsaContext : DbContext
             entity.ToTable("Compra");
 
             entity.Property(e => e.IdCompra).HasColumnName("idCompra");
-            entity.Property(e => e.CantidadExistentes).HasColumnName("cantidadExistentes");
+            entity.Property(e => e.cantidadComprada).HasColumnName("cantidadComprada");
             entity.Property(e => e.IdDetalleMateriaPrima).HasColumnName("idDetalle_materia_prima");
             entity.Property(e => e.IdMateriaPrima).HasColumnName("idMateriaPrima");
 

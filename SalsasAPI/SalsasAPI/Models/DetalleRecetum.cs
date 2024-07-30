@@ -7,7 +7,8 @@ public partial class DetalleRecetum
 {
     public int IdDetalleReceta { get; set; }
 
-    public double Porcion { get; set; }
+    public int CantidadMateriaPrima { get; set; }
+    public int MedidaIngrediente { get; set; }
 
     public int? IdMateriaPrima { get; set; }
 

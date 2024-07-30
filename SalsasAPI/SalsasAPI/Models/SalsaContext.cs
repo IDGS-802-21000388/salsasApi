@@ -65,10 +65,13 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<Ventum> Venta { get; set; }
 
     public virtual DbSet<EnvioDetalle> EnvioDetalles { get; set; }
+    public virtual DbSet<vw_Detalle_Receta> vw_Detalle_Receta { get; set; }
+    public virtual DbSet<vw_Producto_Detalle> vw_Producto_Detalle { get; set; }
+    public virtual DbSet<vw_MateriaPrima_Detalle> vw_MateriaPrima_Detalle { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02; Initial Catalog=Salsas; user id=sa; password=root;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-LRBNNN5; Initial Catalog=salsa; user id=sa; password=angel2704;TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,9 +151,10 @@ public partial class SalsaContext : DbContext
             entity.ToTable("Detalle_receta");
 
             entity.Property(e => e.IdDetalleReceta).HasColumnName("idDetalle_receta");
+            entity.Property(e => e.CantidadMateriaPrima).HasColumnName("cantidadMateriaPrima");
+            entity.Property(e => e.MedidaIngrediente).HasColumnName("medidaIngrediente");
             entity.Property(e => e.IdMateriaPrima).HasColumnName("idMateriaPrima");
             entity.Property(e => e.IdReceta).HasColumnName("idReceta");
-            entity.Property(e => e.Porcion).HasColumnName("porcion");
 
             entity.HasOne(d => d.IdMateriaPrimaNavigation).WithMany(p => p.DetalleReceta)
                 .HasForeignKey(d => d.IdMateriaPrima)
@@ -479,6 +483,7 @@ public partial class SalsaContext : DbContext
             entity.Property(e => e.Fotografia)
                 .HasColumnType("text")
                 .HasColumnName("fotografia");
+            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.IdMedida).HasColumnName("idMedida");
             entity.Property(e => e.NombreProducto)
                 .HasMaxLength(50)
@@ -711,6 +716,37 @@ public partial class SalsaContext : DbContext
             eb.Property(v => v.Total).HasColumnName("total");
         });
 
+        modelBuilder.Entity<vw_Detalle_Receta>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("vw_Detalle_Receta_Producto");
+            eb.Property(v => v.IdProducto).HasColumnName("idProducto");
+            eb.Property(v => v.PrecioVenta).HasColumnName("precioVenta");
+            eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
+            eb.Property(v => v.MedidaProducto).HasColumnName("MedidaProducto");
+            eb.Property(v => v.IdReceta).HasColumnName("idReceta");
+            eb.Property(v => v.NombreMateria).HasColumnName("nombreMateria");
+        });
+
+        modelBuilder.Entity<vw_Producto_Detalle>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("vw_Producto_Detalle");
+            eb.Property(v => v.IdProducto).HasColumnName("idProducto");
+            eb.Property(v => v.NombreProducto).HasColumnName("nombreProducto");
+            eb.Property(v => v.Cantidad).HasColumnName("cantidad");
+            eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
+            eb.Property(v => v.Fotografia).HasColumnName("fotografia");
+        });
+
+        modelBuilder.Entity<vw_MateriaPrima_Detalle>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("vw_MateriaPrima_Detalle");
+            eb.Property(v => v.IdMateriaPrima).HasColumnName("idMateriaPrima");
+            eb.Property(v => v.NombreMateria).HasColumnName("nombreMateria");
+            eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
+        });
         modelBuilder.Entity<Ventum>(entity =>
         {
             entity.HasKey(e => e.IdVenta).HasName("PK__Venta__077D56146F550EF7");

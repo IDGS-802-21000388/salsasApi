@@ -89,11 +89,12 @@
                 .Include(dv => dv.IdProductoNavigation)
                 .ThenInclude(p => p.IdMedidaNavigation)
                 .Where(dv => dv.IdVentaNavigation.FechaVenta.Year == year)
-                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
+                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.Cantidad, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
                 .Select(g => new
                 {
                     g.Key.IdProducto,
                     g.Key.NombreProducto,
+                    g.Key.Cantidad,
                     g.Key.TipoMedida,
                     TotalSold = g.Sum(dv => dv.Cantidad)
                 })
@@ -110,11 +111,12 @@
                 .Include(dv => dv.IdProductoNavigation)
                 .ThenInclude(p => p.IdMedidaNavigation)
                 .Where(dv => dv.IdVentaNavigation.FechaVenta.Year == year && dv.IdVentaNavigation.FechaVenta.Month == month)
-                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
+                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.Cantidad, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
                 .Select(g => new
                 {
                     g.Key.IdProducto,
                     g.Key.NombreProducto,
+                    g.Key.Cantidad,
                     g.Key.TipoMedida,
                     TotalSold = g.Sum(dv => dv.Cantidad)
                 })
@@ -123,6 +125,7 @@
 
             return Ok(topProducts);
         }
+
 
         [HttpGet("sales-distribution")]
         public async Task<ActionResult<IEnumerable<object>>> GetSalesDistributionByYear([FromQuery] int year)

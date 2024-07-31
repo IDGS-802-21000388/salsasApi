@@ -716,11 +716,12 @@ public partial class SalsaContext : DbContext
             eb.HasNoKey();
             eb.ToView("vw_Detalle_Receta_Producto");
             eb.Property(v => v.IdProducto).HasColumnName("idProducto");
-            eb.Property(v => v.PrecioVenta).HasColumnName("precioVenta");
-            eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
-            eb.Property(v => v.MedidaProducto).HasColumnName("MedidaProducto");
-            eb.Property(v => v.IdReceta).HasColumnName("idReceta");
+            eb.Property(v => v.IdMateriaPrima).HasColumnName("idMateriaPrima");
             eb.Property(v => v.NombreMateria).HasColumnName("nombreMateria");
+            eb.Property(v => v.Cantidad).HasColumnName("cantidadMateriaPrima");
+            eb.Property(v => v.IdMedida).HasColumnName("idMedida");
+            eb.Property(v => v.TipoMedida).HasColumnName("MedidaProducto");
+            eb.Property(v => v.IdReceta).HasColumnName("idReceta");
         });
 
         modelBuilder.Entity<vw_Producto_Detalle>(eb =>
@@ -728,10 +729,13 @@ public partial class SalsaContext : DbContext
             eb.HasNoKey();
             eb.ToView("vw_Producto_Detalle");
             eb.Property(v => v.IdProducto).HasColumnName("idProducto");
+            eb.Property(v => v.PrecioVenta).HasColumnName("precioVenta");
+            eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
             eb.Property(v => v.NombreProducto).HasColumnName("nombreProducto");
             eb.Property(v => v.Cantidad).HasColumnName("cantidad");
             eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
             eb.Property(v => v.Fotografia).HasColumnName("fotografia");
+            eb.Property(v => v.Estatus).HasColumnName("estatus");
         });
 
         modelBuilder.Entity<vw_MateriaPrima_Detalle>(eb =>

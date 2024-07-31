@@ -71,7 +71,11 @@ public partial class SalsaContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+<<<<<<< HEAD
         => optionsBuilder.UseSqlServer("Server=DESKTOP-LRBNNN5; Initial Catalog=salsa; user id=sa; password=angel2704;TrustServerCertificate=true");
+=======
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
+>>>>>>> origin/main
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -82,7 +86,7 @@ public partial class SalsaContext : DbContext
             entity.ToTable("Compra");
 
             entity.Property(e => e.IdCompra).HasColumnName("idCompra");
-            entity.Property(e => e.CantidadExistentes).HasColumnName("cantidadExistentes");
+            entity.Property(e => e.cantidadComprada).HasColumnName("cantidadComprada");
             entity.Property(e => e.IdDetalleMateriaPrima).HasColumnName("idDetalle_materia_prima");
             entity.Property(e => e.IdMateriaPrima).HasColumnName("idMateriaPrima");
 
@@ -201,14 +205,9 @@ public partial class SalsaContext : DbContext
 
             entity.Property(e => e.IdDetalleVenta).HasColumnName("idDetalleVenta");
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
-            entity.Property(e => e.IdMedida).HasColumnName("idMedida");
             entity.Property(e => e.IdProducto).HasColumnName("idProducto");
             entity.Property(e => e.IdVenta).HasColumnName("idVenta");
             entity.Property(e => e.Subtotal).HasColumnName("subtotal");
-
-            entity.HasOne(d => d.IdMedidaNavigation).WithMany(p => p.DetalleVenta)
-                .HasForeignKey(d => d.IdMedida)
-                .HasConstraintName("FK__DetalleVe__idMed__03F0984C");
 
             entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.DetalleVenta)
                 .HasForeignKey(d => d.IdProducto)
@@ -757,6 +756,12 @@ public partial class SalsaContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("fechaVenta");
             entity.Property(e => e.Total).HasColumnName("total");
+
+            // Configuración de la relación con Usuario
+            entity.HasOne(d => d.IdUsuarioNavigation)
+                .WithMany(p => p.Ventas)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_Venta_Usuario");
         });
 
         OnModelCreatingPartial(modelBuilder);

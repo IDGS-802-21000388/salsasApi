@@ -15,10 +15,6 @@ public partial class DetalleVentum
 
     public int? IdProducto { get; set; }
 
-    public int? IdMedida { get; set; }
-
-    public virtual Medidum? IdMedidaNavigation { get; set; }
-
     public virtual Producto? IdProductoNavigation { get; set; }
 
     public virtual Ventum? IdVentaNavigation { get; set; }

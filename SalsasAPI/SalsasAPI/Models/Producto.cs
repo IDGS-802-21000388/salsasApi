@@ -14,7 +14,7 @@ public partial class Producto
 
     public double PrecioProduccion { get; set; }
 
-    public int? Cantidad { get; set; }
+    public double Cantidad { get; set; }
 
     public int? IdMedida { get; set; }
 

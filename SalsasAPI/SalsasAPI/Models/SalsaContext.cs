@@ -71,11 +71,7 @@ public partial class SalsaContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-<<<<<<< HEAD
         => optionsBuilder.UseSqlServer("Server=DESKTOP-LRBNNN5; Initial Catalog=salsa; user id=sa; password=angel2704;TrustServerCertificate=true");
-=======
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
->>>>>>> origin/main
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -720,11 +716,12 @@ public partial class SalsaContext : DbContext
             eb.HasNoKey();
             eb.ToView("vw_Detalle_Receta_Producto");
             eb.Property(v => v.IdProducto).HasColumnName("idProducto");
-            eb.Property(v => v.PrecioVenta).HasColumnName("precioVenta");
-            eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
-            eb.Property(v => v.MedidaProducto).HasColumnName("MedidaProducto");
-            eb.Property(v => v.IdReceta).HasColumnName("idReceta");
+            eb.Property(v => v.IdMateriaPrima).HasColumnName("idMateriaPrima");
             eb.Property(v => v.NombreMateria).HasColumnName("nombreMateria");
+            eb.Property(v => v.Cantidad).HasColumnName("cantidadMateriaPrima");
+            eb.Property(v => v.IdMedida).HasColumnName("idMedida");
+            eb.Property(v => v.TipoMedida).HasColumnName("MedidaProducto");
+            eb.Property(v => v.IdReceta).HasColumnName("idReceta");
         });
 
         modelBuilder.Entity<vw_Producto_Detalle>(eb =>
@@ -732,10 +729,13 @@ public partial class SalsaContext : DbContext
             eb.HasNoKey();
             eb.ToView("vw_Producto_Detalle");
             eb.Property(v => v.IdProducto).HasColumnName("idProducto");
+            eb.Property(v => v.PrecioVenta).HasColumnName("precioVenta");
+            eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
             eb.Property(v => v.NombreProducto).HasColumnName("nombreProducto");
             eb.Property(v => v.Cantidad).HasColumnName("cantidad");
             eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
             eb.Property(v => v.Fotografia).HasColumnName("fotografia");
+            eb.Property(v => v.Estatus).HasColumnName("estatus");
         });
 
         modelBuilder.Entity<vw_MateriaPrima_Detalle>(eb =>

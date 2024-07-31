@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SalsasAPI.Models;
 
@@ -16,8 +17,8 @@ public partial class Merma
     public int? IdProducto { get; set; }
 
     public int? IdDetalleProducto { get; set; }
-
+    [JsonIgnore]
     public virtual DetalleProducto? IdDetalleProductoNavigation { get; set; }
-
+    [JsonIgnore]
     public virtual Producto? IdProductoNavigation { get; set; }
 }

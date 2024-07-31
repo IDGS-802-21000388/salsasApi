@@ -40,6 +40,21 @@ namespace SalsasAPI.Controllers
             return detalleMateriaPrima;
         }
 
+        // GET: api/detallemateriaprima/byMateriaPrima/5
+        [HttpGet("byMateriaPrima/{idMateriaPrima}")]
+        public async Task<ActionResult<DetalleMateriaPrima>> GetDetalleMateriaPrimaByMateriaPrimaId(int idMateriaPrima)
+        {
+            var detalleMateriaPrima = await _context.DetalleMateriaPrimas
+                                                    .FirstOrDefaultAsync(d => d.IdMateriaPrima == idMateriaPrima);
+
+            if (detalleMateriaPrima == null)
+            {
+                return NotFound();
+            }
+
+            return detalleMateriaPrima;
+        }
+
         // PUT: api/detallemateriaprima/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDetalleMateriaPrima(int id, DetalleMateriaPrima detalleMateriaPrima)
@@ -66,6 +81,22 @@ namespace SalsasAPI.Controllers
                     throw;
                 }
             }
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}/detalle")]
+        public async Task<IActionResult> UpdateDetalleSolicitudMateria(int id, [FromBody] int detalle)
+        {
+            var detalleSolicitud = await _context.DetalleMateriaPrimas.FindAsync(id);
+            if (detalleSolicitud == null)
+            {
+                return NotFound();
+            }
+
+            detalleSolicitud.CantidadExistentes = detalle;
+            _context.Entry(detalleSolicitud).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

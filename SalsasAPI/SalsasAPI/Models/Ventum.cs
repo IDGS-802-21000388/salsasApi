@@ -11,6 +11,7 @@ public partial class Ventum
     public DateTime FechaVenta { get; set; }
 
     public double Total { get; set; }
+    public int? IdUsuario { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<DetalleVentum> DetalleVenta { get; set; } = new List<DetalleVentum>();
@@ -20,4 +21,6 @@ public partial class Ventum
     public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
     [JsonIgnore]
     public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+    [JsonIgnore]
+    public virtual Usuario? IdUsuarioNavigation { get; set; }
 }

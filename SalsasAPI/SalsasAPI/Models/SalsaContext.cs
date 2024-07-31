@@ -197,14 +197,9 @@ public partial class SalsaContext : DbContext
 
             entity.Property(e => e.IdDetalleVenta).HasColumnName("idDetalleVenta");
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
-            entity.Property(e => e.IdMedida).HasColumnName("idMedida");
             entity.Property(e => e.IdProducto).HasColumnName("idProducto");
             entity.Property(e => e.IdVenta).HasColumnName("idVenta");
             entity.Property(e => e.Subtotal).HasColumnName("subtotal");
-
-            entity.HasOne(d => d.IdMedidaNavigation).WithMany(p => p.DetalleVenta)
-                .HasForeignKey(d => d.IdMedida)
-                .HasConstraintName("FK__DetalleVe__idMed__03F0984C");
 
             entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.DetalleVenta)
                 .HasForeignKey(d => d.IdProducto)
@@ -721,6 +716,12 @@ public partial class SalsaContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("fechaVenta");
             entity.Property(e => e.Total).HasColumnName("total");
+
+            // Configuración de la relación con Usuario
+            entity.HasOne(d => d.IdUsuarioNavigation)
+                .WithMany(p => p.Ventas)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_Venta_Usuario");
         });
 
         OnModelCreatingPartial(modelBuilder);

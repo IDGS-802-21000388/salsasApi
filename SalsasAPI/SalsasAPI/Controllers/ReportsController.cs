@@ -81,5 +81,67 @@
 
                 return Ok(monthlyPurchases);
             }
+
+        [HttpGet("top-selling-products-year")]
+        public async Task<ActionResult<IEnumerable<object>>> GetTopSellingProductsByYear([FromQuery] int year)
+        {
+            var topProducts = await _context.DetalleVenta
+                .Include(dv => dv.IdProductoNavigation)
+                .ThenInclude(p => p.IdMedidaNavigation)
+                .Where(dv => dv.IdVentaNavigation.FechaVenta.Year == year)
+                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
+                .Select(g => new
+                {
+                    g.Key.IdProducto,
+                    g.Key.NombreProducto,
+                    g.Key.TipoMedida,
+                    TotalSold = g.Sum(dv => dv.Cantidad)
+                })
+                .OrderByDescending(g => g.TotalSold)
+                .ToListAsync();
+
+            return Ok(topProducts);
+        }
+
+        [HttpGet("top-selling-products-month")]
+        public async Task<ActionResult<IEnumerable<object>>> GetTopSellingProductsByMonth([FromQuery] int year, [FromQuery] int month)
+        {
+            var topProducts = await _context.DetalleVenta
+                .Include(dv => dv.IdProductoNavigation)
+                .ThenInclude(p => p.IdMedidaNavigation)
+                .Where(dv => dv.IdVentaNavigation.FechaVenta.Year == year && dv.IdVentaNavigation.FechaVenta.Month == month)
+                .GroupBy(dv => new { dv.IdProducto, dv.IdProductoNavigation.NombreProducto, dv.IdProductoNavigation.IdMedidaNavigation.TipoMedida })
+                .Select(g => new
+                {
+                    g.Key.IdProducto,
+                    g.Key.NombreProducto,
+                    g.Key.TipoMedida,
+                    TotalSold = g.Sum(dv => dv.Cantidad)
+                })
+                .OrderByDescending(g => g.TotalSold)
+                .ToListAsync();
+
+            return Ok(topProducts);
+        }
+
+        [HttpGet("sales-distribution")]
+        public async Task<ActionResult<IEnumerable<object>>> GetSalesDistributionByYear([FromQuery] int year)
+        {
+            var ventas = await _context.Venta
+                .Include(v => v.IdUsuarioNavigation)
+                .Where(v => v.FechaVenta.Year == year)
+                .ToListAsync();
+
+            var distribution = ventas
+                .GroupBy(v => v.IdUsuarioNavigation.Rol)
+                .Select(g => new
+                {
+                    Rol = g.Key,
+                    TotalVentas = g.Sum(v => v.Total)
+                })
+                .ToList();
+
+            return Ok(distribution);
         }
     }
+}

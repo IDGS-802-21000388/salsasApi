@@ -32,4 +32,6 @@ public partial class Usuario
     public virtual ICollection<DetalleSolicitud> DetalleSolicituds { get; set; } = new List<DetalleSolicitud>();
     [JsonIgnore]
     public virtual ICollection<SolicitudProduccion> SolicitudProduccions { get; set; } = new List<SolicitudProduccion>();
+    [JsonIgnore]
+    public virtual ICollection<Ventum> Ventas { get; set; } = new List<Ventum>();
 }

@@ -70,12 +70,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<vw_MateriaPrima_Detalle> vw_MateriaPrima_Detalle { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-<<<<<<< HEAD
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-LRBNNN5; Initial Catalog=salsa; user id=sa; password=angel2704;TrustServerCertificate=true");
-=======
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
->>>>>>> origin/main
+        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02;Initial Catalog=SalsasReni;User Id=sa;Password=root;TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

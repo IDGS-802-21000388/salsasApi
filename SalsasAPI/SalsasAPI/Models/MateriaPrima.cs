@@ -17,23 +17,23 @@ public partial class MateriaPrima
     public int? IdMedida { get; set; }
 
     public int? IdProveedor { get; set; }
-    
 
+    [JsonIgnore]
     public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
-    
+    [JsonIgnore]
 
     public virtual ICollection<DetalleMateriaPrima> DetalleMateriaPrimas { get; set; } = new List<DetalleMateriaPrima>();
     [JsonIgnore]
 
     public virtual ICollection<DetalleRecetum> DetalleReceta { get; set; } = new List<DetalleRecetum>();
-    
+    [JsonIgnore]
 
     public virtual Medidum? IdMedidaNavigation { get; set; }
     [JsonIgnore]
 
     public virtual Proveedor? IdProveedorNavigation { get; set; }
-    
 
+    [JsonIgnore]
     public virtual ICollection<MermaInventario> MermaInventarios { get; set; } = new List<MermaInventario>();
     [JsonIgnore]
 

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace SalsasAPI.Controllers
 {
+    // endpoint: api/producto
+
     [Route("api/[controller]")]
     [ApiController]
     public class ProductoController : ControllerBase

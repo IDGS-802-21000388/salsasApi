@@ -4,6 +4,7 @@ using SalsasAPI.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BCrypt.Net; // Asegúrate de importar este espacio de nombres
 
 namespace SalsasAPI.Controllers
 {
@@ -22,9 +23,9 @@ namespace SalsasAPI.Controllers
         public IActionResult Login([FromBody] LoginRequest loginRequest)
         {
             var user = _context.Usuarios
-                               .FirstOrDefault(u => u.Correo == loginRequest.Correo && u.Contrasenia == loginRequest.Contrasenia);
+                               .FirstOrDefault(u => u.Correo == loginRequest.Correo);
 
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Contrasenia, user.Contrasenia))
             {
                 return Unauthorized("Invalid credentials");
             }
@@ -61,13 +62,16 @@ namespace SalsasAPI.Controllers
             _context.Direccion.Add(direccion);
             await _context.SaveChangesAsync();
 
+            // Encriptar la contraseña antes de guardar el usuario
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Contrasenia);
+
             // Crear y guardar el usuario con el ID de la dirección
             var user = new Usuario
             {
                 Nombre = registerRequest.Nombre,
                 NombreUsuario = registerRequest.NombreUsuario,
                 Correo = registerRequest.Correo,
-                Contrasenia = registerRequest.Contrasenia,
+                Contrasenia = hashedPassword,
                 Telefono = registerRequest.Telefono,
                 Rol = "cliente",
                 Estatus = 1,

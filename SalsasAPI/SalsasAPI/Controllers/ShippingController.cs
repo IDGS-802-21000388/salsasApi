@@ -32,6 +32,13 @@ namespace SalsasAPI.Controllers
             return Ok(envioDetalle);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetEnvioDetalles()
+        {
+            var detalles = await _context.EnvioDetallesWeb.ToListAsync();
+            return Ok(detalles);
+        }
+
         [HttpPut("updateStatus/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)
         {

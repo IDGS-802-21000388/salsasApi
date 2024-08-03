@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SalsasAPI.Models;
+using SalsasAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,10 @@ builder.Services.AddSwaggerGen();
 
 var connecionString = builder.Configuration.GetConnectionString("cadenaSQL");
 builder.Services.AddDbContext<SalsaContext>(options => options.UseSqlServer(connecionString));
+
+// Register the ETL service
+builder.Services.AddHostedService<ETLService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NuevaPolitica", app =>

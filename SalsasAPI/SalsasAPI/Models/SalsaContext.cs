@@ -64,14 +64,19 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<Ventum> Venta { get; set; }
 
+    public virtual DbSet<VentasPorProductoPeriodo> VentasPorProductoPeriodos { get; set; }
+
     public virtual DbSet<EnvioDetalle> EnvioDetalles { get; set; }
     public virtual DbSet<vw_Detalle_Receta> vw_Detalle_Receta { get; set; }
     public virtual DbSet<vw_Producto_Detalle> vw_Producto_Detalle { get; set; }
     public virtual DbSet<vw_MateriaPrima_Detalle> vw_MateriaPrima_Detalle { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02;Initial Catalog=SalsasReni;User Id=sa;Password=root;TrustServerCertificate=true");
+    public virtual DbSet<InventarioReporte> InventarioReporte { get; set; }
+    public virtual DbSet<RankingClientes> RankingClientes { get; set; }
 
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Compra>(entity =>
@@ -142,6 +147,30 @@ public partial class SalsaContext : DbContext
                 .HasForeignKey(d => d.IdProducto)
                 .HasConstraintName("FK__Detalle_p__idPro__656C112C");
         });
+
+        // Configuración de la tabla VentasPorProductoPeriodo
+            modelBuilder.Entity<VentasPorProductoPeriodo>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK_VentasPorProductoPeriodo");
+
+                entity.ToTable("VentasPorProductoPeriodo");
+
+                entity.Property(e => e.Id).HasColumnName("Id");
+                entity.Property(e => e.ProductoId).HasColumnName("ProductoId");
+                entity.Property(e => e.NombreProducto).HasColumnName("NombreProducto").HasMaxLength(50);
+                entity.Property(e => e.PeriodoInicio).HasColumnName("PeriodoInicio").HasColumnType("date");
+                entity.Property(e => e.PeriodoFin).HasColumnName("PeriodoFin").HasColumnType("date");
+                entity.Property(e => e.NumeroVentas).HasColumnName("NumeroVentas");
+                entity.Property(e => e.CantidadVendida).HasColumnName("CantidadVendida");
+                entity.Property(e => e.TotalRecaudado).HasColumnName("TotalRecaudado");
+                entity.Property(e => e.IndicadorGlobal).HasColumnName("IndicadorGlobal");
+
+                entity.HasOne(d => d.Producto)
+                    .WithMany(p => p.VentasPorProductoPeriodos)
+                    .HasForeignKey(d => d.ProductoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_VentasPorProductoPeriodo_Producto");
+            });
 
         modelBuilder.Entity<DetalleRecetum>(entity =>
         {
@@ -745,6 +774,40 @@ public partial class SalsaContext : DbContext
             eb.Property(v => v.NombreMateria).HasColumnName("nombreMateria");
             eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
         });
+
+        // Configuración de la tabla InventarioReporte
+        modelBuilder.Entity<InventarioReporte>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_InventarioReporte");
+
+            entity.ToTable("InventarioReporte");
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Tipo).HasColumnName("Tipo").HasMaxLength(50);
+            entity.Property(e => e.Nombre).HasColumnName("Nombre").HasMaxLength(100);
+            entity.Property(e => e.Cantidad).HasColumnName("Cantidad");
+            entity.Property(e => e.UltimaActualizacion).HasColumnName("UltimaActualizacion").HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<RankingClientes>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_RankingClientes");
+
+            entity.ToTable("RankingClientes");
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
+            entity.Property(e => e.NombreUsuario).HasColumnName("NombreUsuario").HasMaxLength(100);
+            entity.Property(e => e.ComprasTotales).HasColumnName("ComprasTotales");
+            entity.Property(e => e.ProductosComprados).HasColumnName("ProductosComprados").HasColumnType("text");
+            entity.Property(e => e.UltimaActualizacion).HasColumnName("UltimaActualizacion").HasColumnType("datetime");
+
+            entity.HasOne(d => d.Usuario)
+                .WithMany(p => p.RankingClientes)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_RankingClientes_Usuario");
+        });
+
         modelBuilder.Entity<Ventum>(entity =>
         {
             entity.HasKey(e => e.IdVenta).HasName("PK__Venta__077D56146F550EF7");

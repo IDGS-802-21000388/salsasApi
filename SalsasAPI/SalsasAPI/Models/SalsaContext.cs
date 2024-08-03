@@ -16,6 +16,7 @@ public partial class SalsaContext : DbContext
     }
 
     public virtual DbSet<Compra> Compras { get; set; }
+    public virtual DbSet<EnvioDetalleWeb> EnvioDetallesWeb { get; set; }
 
     public virtual DbSet<DetalleMateriaPrima> DetalleMateriaPrimas { get; set; }
 
@@ -73,12 +74,17 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<InventarioReporte> InventarioReporte { get; set; }
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
-
-
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        modelBuilder.Entity<EnvioDetalleWeb>(entity =>
+        {
+            entity.HasNoKey(); // Las vistas no tienen clave primaria
+            entity.ToView("vw_Envio_DetallesWeb"); // Nombre de la vista
+        });
         modelBuilder.Entity<Compra>(entity =>
         {
             entity.HasKey(e => e.IdCompra).HasName("PK__Compra__48B99DB7DE15CCD8");

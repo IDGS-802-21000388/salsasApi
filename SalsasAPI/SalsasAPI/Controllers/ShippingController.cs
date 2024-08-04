@@ -21,8 +21,8 @@ namespace SalsasAPI.Controllers
         public async Task<ActionResult<EnvioDetalle>> GetShippingApi()
         {
             var envioDetalle = await _context.EnvioDetalles
-                                             .Where(ed => ed.EstatusPedido == 4)
-                                             .FirstOrDefaultAsync();
+                                             .Where(e => e.EstatusEnvio.ToLower() == "en tránsito")
+                                             .ToListAsync();
 
             if (envioDetalle == null)
             {

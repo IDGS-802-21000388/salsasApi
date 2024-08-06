@@ -76,7 +76,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-B423Q0C; Initial Catalog=salsa; user id=sa; password=root;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=LENOVO\\MSSQLSERVER02;Initial Catalog=SalsasReni;User Id=sa;Password=root;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 

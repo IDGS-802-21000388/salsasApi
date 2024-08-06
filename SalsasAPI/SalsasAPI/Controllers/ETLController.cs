@@ -12,9 +12,23 @@ namespace SalsasAPI.Controllers
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public ETLController(IServiceProvider serviceProvider)
+
+        private readonly SalsaContext _context;
+
+        public ETLController(SalsaContext context)
         {
-            _serviceProvider = serviceProvider;
+            _context = context;
         }
+
+        [HttpGet("getVentasPorProductoPeriodos")]
+        public async Task<ActionResult<IEnumerable<VentasPorProductoPeriodo>>> GetVentasPorProductoPeriodos()
+        {
+            // Incluye la relación de navegación con la entidad Producto
+            return await _context.VentasPorProductoPeriodos
+                                 .Include(v => v.Producto) // Asegúrate de que el nombre de la propiedad de navegación sea correcto
+                                 .ToListAsync();
+        }
+
+
     }
 }

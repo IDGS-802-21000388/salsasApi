@@ -6,19 +6,19 @@ namespace SalsasAPI.Models;
 
 public partial class DetalleMateriaPrima
 {
-    public int IdDetalleMateriaPrima { get; set; }
+    public int idDetalleMateriaPrima { get; set; }
 
-    public DateTime FechaCompra { get; set; }
+    public DateTime fechaCompra { get; set; }
 
-    public DateTime? FechaVencimiento { get; set; }
+    public DateTime? fechaVencimiento { get; set; }
 
-    public double CantidadExistentes { get; set; }
+    public double cantidadExistentes { get; set; }
 
-    public int Estatus { get; set; }
+    public int estatus { get; set; }
 
-    public int? IdMateriaPrima { get; set; }
+    public int? idMateriaPrima { get; set; }
 
-    public int Porcentaje { get; set; }
+    public int porcentaje { get; set; }
     [JsonIgnore]
     public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
     [JsonIgnore]

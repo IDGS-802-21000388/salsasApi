@@ -45,7 +45,7 @@ namespace SalsasAPI.Controllers
         public async Task<ActionResult<DetalleMateriaPrima>> GetDetalleMateriaPrimaByMateriaPrimaId(int idMateriaPrima)
         {
             var detalleMateriaPrima = await _context.DetalleMateriaPrimas
-                                                    .FirstOrDefaultAsync(d => d.IdMateriaPrima == idMateriaPrima);
+                                                    .FirstOrDefaultAsync(d => d.idMateriaPrima == idMateriaPrima);
 
             if (detalleMateriaPrima == null)
             {
@@ -59,7 +59,7 @@ namespace SalsasAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDetalleMateriaPrima(int id, DetalleMateriaPrima detalleMateriaPrima)
         {
-            if (id != detalleMateriaPrima.IdDetalleMateriaPrima)
+            if (id != detalleMateriaPrima.idDetalleMateriaPrima)
             {
                 return BadRequest();
             }
@@ -94,7 +94,7 @@ namespace SalsasAPI.Controllers
                 return NotFound();
             }
 
-            detalleSolicitud.CantidadExistentes = detalle;
+            detalleSolicitud.cantidadExistentes = detalle;
             _context.Entry(detalleSolicitud).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
@@ -108,7 +108,7 @@ namespace SalsasAPI.Controllers
             _context.DetalleMateriaPrimas.Add(detalleMateriaPrima);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDetalleMateriaPrima), new { id = detalleMateriaPrima.IdDetalleMateriaPrima }, detalleMateriaPrima);
+            return CreatedAtAction(nameof(GetDetalleMateriaPrima), new { id = detalleMateriaPrima.idDetalleMateriaPrima }, detalleMateriaPrima);
         }
 
         // DELETE: api/detallemateriaprima/5
@@ -121,7 +121,7 @@ namespace SalsasAPI.Controllers
                 return NotFound();
             }
 
-            detalleMateriaPrima.Estatus = 0;
+            detalleMateriaPrima.estatus = 0;
             _context.Entry(detalleMateriaPrima).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
@@ -138,7 +138,7 @@ namespace SalsasAPI.Controllers
                 return NotFound();
             }
 
-            detalleMateriaPrima.Estatus = 1;
+            detalleMateriaPrima.estatus = 1;
             _context.Entry(detalleMateriaPrima).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
@@ -147,7 +147,7 @@ namespace SalsasAPI.Controllers
 
         private bool DetalleMateriaPrimaExists(int id)
         {
-            return _context.DetalleMateriaPrimas.Any(e => e.IdDetalleMateriaPrima == id);
+            return _context.DetalleMateriaPrimas.Any(e => e.idDetalleMateriaPrima == id);
         }
     }
 }

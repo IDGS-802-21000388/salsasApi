@@ -40,9 +40,9 @@
                 var query = _context.Compras.Include(c => c.IdDetalleMateriaPrimaNavigation).AsQueryable();
 
                 if (startDate.HasValue)
-                    query = query.Where(c => c.IdDetalleMateriaPrimaNavigation.FechaCompra >= startDate.Value);
+                    query = query.Where(c => c.IdDetalleMateriaPrimaNavigation.fechaCompra >= startDate.Value);
                 if (endDate.HasValue)
-                    query = query.Where(c => c.IdDetalleMateriaPrimaNavigation.FechaCompra <= endDate.Value);
+                    query = query.Where(c => c.IdDetalleMateriaPrimaNavigation.fechaCompra <= endDate.Value);
 
                 var totalPurchases = await query.SumAsync(c => c.cantidadComprada * c.IdMateriaPrimaNavigation.PrecioCompra);
 
@@ -70,8 +70,8 @@
             {
                 var monthlyPurchases = await _context.Compras
                     .Include(c => c.IdDetalleMateriaPrimaNavigation)
-                    .Where(c => c.IdDetalleMateriaPrimaNavigation.FechaCompra.Year == year)
-                    .GroupBy(c => c.IdDetalleMateriaPrimaNavigation.FechaCompra.Month)
+                    .Where(c => c.IdDetalleMateriaPrimaNavigation.fechaCompra.Year == year)
+                    .GroupBy(c => c.IdDetalleMateriaPrimaNavigation.fechaCompra.Month)
                     .Select(g => new
                     {
                         Month = g.Key,

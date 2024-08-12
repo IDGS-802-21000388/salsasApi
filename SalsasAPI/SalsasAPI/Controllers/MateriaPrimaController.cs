@@ -80,7 +80,21 @@ namespace SalsasAPI.Controllers
             return CreatedAtAction(nameof(GetMateriaPrima), new { id = materiaPrima.IdMateriaPrima }, materiaPrima);
         }
 
-        
+        [HttpPut("{id}/cantidad")]
+        public async Task<IActionResult> UpdateDetalleSolicitudMateria(int id, [FromBody] int cantidad)
+        {
+            var detalleSolicitud = await _context.DetalleMateriaPrimas.FindAsync(id);
+            if (detalleSolicitud == null)
+            {
+                return NotFound();
+            }
+
+            detalleSolicitud.cantidadExistentes = cantidad;
+            _context.Entry(detalleSolicitud).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
 
         private bool MateriaPrimaExists(int id)
         {

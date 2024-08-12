@@ -19,7 +19,6 @@ namespace SalsasAPI.Controllers
         {
             return await _context.SolicitudProduccions.ToListAsync();
         }
-
         [HttpGet("{id}")]
         public async Task<ActionResult> GetSolicitudProduccion(int id)
         {
@@ -32,7 +31,9 @@ namespace SalsasAPI.Controllers
                     sp.Estatus,
                     sp.IdVenta,
                     sp.IdUsuario,
-                    NombreCliente = sp.IdUsuarioNavigation.Nombre,
+                    NombreUsuario = sp.IdUsuarioNavigation.Nombre,
+                    FechaVenta = sp.IdVentaNavigation.FechaVenta,  // Información de la venta
+                    TotalVenta = sp.IdVentaNavigation.Total,  // Información de la venta
                     DetalleSolicituds = sp.DetalleSolicituds.Select(ds => new
                     {
                         ds.IdDetalleSolicitud,
@@ -53,6 +54,7 @@ namespace SalsasAPI.Controllers
 
             return Ok(solicitudProduccion);
         }
+
 
         // POST: api/solicitudproduccion
         [HttpPost]

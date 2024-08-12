@@ -76,7 +76,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=salsa; user id=sa; password=123456;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-B423Q0C; Initial Catalog=salsa; user id=sa; password=root;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -575,10 +575,10 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK__Receta__idProduc__74AE54BC");
         });
 
+
         modelBuilder.Entity<SolicitudProduccion>(entity =>
         {
             entity.HasKey(e => e.IdSolicitud).HasName("PK__Solicitu__D801DDB8417435EB");
-
             entity.ToTable("SolicitudProduccion");
 
             entity.Property(e => e.IdSolicitud).HasColumnName("idSolicitud");
@@ -595,6 +595,7 @@ public partial class SalsaContext : DbContext
             entity.Property(e => e.IdVenta).HasColumnName("idVenta");
 
             entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.IdVenta).HasColumnName("idVenta");
 
             entity.HasOne(d => d.IdVentaNavigation).WithMany(p => p.SolicitudProduccions)
                 .HasForeignKey(d => d.IdVenta)
@@ -603,7 +604,15 @@ public partial class SalsaContext : DbContext
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.SolicitudProduccions)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("FK__Solicitud__idUsu__114A936A");
+
+            entity.HasOne(d => d.IdVentaNavigation)
+                .WithMany(p => p.SolicitudProduccions)
+                .HasForeignKey(d => d.IdVenta)
+                .HasConstraintName("FK__Solicitud__idVen__1234ABCD");
         });
+
+
+
 
         modelBuilder.Entity<Tarjetum>(entity =>
         {

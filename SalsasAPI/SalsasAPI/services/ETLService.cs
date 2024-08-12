@@ -46,7 +46,7 @@ namespace SalsasAPI.Services
                         {
                             Tipo = "Materia Prima",
                             Nombre = mp.NombreMateria,
-                            Cantidad = mp.DetalleMateriaPrimas.Sum(dmp => dmp.CantidadExistentes),
+                            Cantidad = mp.DetalleMateriaPrimas.Sum(dmp => dmp.cantidadExistentes),
                             UltimaActualizacion = DateTime.Now
                         }).ToList();
 

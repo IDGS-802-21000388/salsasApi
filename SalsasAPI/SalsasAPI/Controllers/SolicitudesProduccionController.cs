@@ -29,9 +29,9 @@ namespace SalsasAPI.Controllers
                     sp.IdSolicitud,
                     sp.FechaSolicitud,
                     sp.Estatus,
+                    sp.IdVenta,
                     sp.IdUsuario,
                     NombreUsuario = sp.IdUsuarioNavigation.Nombre,
-                    sp.IdVenta,
                     FechaVenta = sp.IdVentaNavigation.FechaVenta,  // Información de la venta
                     TotalVenta = sp.IdVentaNavigation.Total,  // Información de la venta
                     DetalleSolicituds = sp.DetalleSolicituds.Select(ds => new
@@ -83,5 +83,22 @@ namespace SalsasAPI.Controllers
             return NoContent();
         }
 
+        [HttpPut("venta/{idVenta}/estatus")]
+        public async Task<IActionResult> UpdateEnvioEstatus(int idVenta, [FromBody] string nuevoEstatus)
+        {
+            var envio = await _context.Envios
+                .FirstOrDefaultAsync(e => e.IdVenta == idVenta);
+
+            if (envio == null)
+            {
+                return NotFound();
+            }
+
+            envio.Estatus = nuevoEstatus;
+            _context.Entry(envio).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

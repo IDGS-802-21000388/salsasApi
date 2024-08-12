@@ -83,13 +83,13 @@ namespace SalsasAPI.Controllers
         [HttpPut("{id}/cantidad")]
         public async Task<IActionResult> UpdateDetalleSolicitudMateria(int id, [FromBody] int cantidad)
         {
-            var detalleSolicitud = await _context.MateriaPrimas.FindAsync(id);
+            var detalleSolicitud = await _context.DetalleMateriaPrimas.FindAsync(id);
             if (detalleSolicitud == null)
             {
                 return NotFound();
             }
 
-            detalleSolicitud.Cantidad = cantidad;
+            detalleSolicitud.cantidadExistentes = cantidad;
             _context.Entry(detalleSolicitud).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

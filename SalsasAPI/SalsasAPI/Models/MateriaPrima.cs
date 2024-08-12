@@ -12,8 +12,6 @@ public partial class MateriaPrima
 
     public double PrecioCompra { get; set; }
 
-    public double Cantidad { get; set; }
-
     public int? IdMedida { get; set; }
 
     public int? IdProveedor { get; set; }

@@ -76,7 +76,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-B423Q0C;Initial Catalog=salsa;User Id=sa;Password=root;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-B423Q0C; Initial Catalog=salsa; user id=sa; password=root;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -323,7 +323,6 @@ public partial class SalsaContext : DbContext
             entity.ToTable("MateriaPrima");
 
             entity.Property(e => e.IdMateriaPrima).HasColumnName("idMateriaPrima");
-            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.IdMedida).HasColumnName("idMedida");
             entity.Property(e => e.IdProveedor).HasColumnName("idProveedor");
             entity.Property(e => e.NombreMateria)
@@ -583,13 +582,26 @@ public partial class SalsaContext : DbContext
             entity.ToTable("SolicitudProduccion");
 
             entity.Property(e => e.IdSolicitud).HasColumnName("idSolicitud");
-            entity.Property(e => e.FechaSolicitud).HasDefaultValueSql("(getdate())").HasColumnType("datetime").HasColumnName("fechaSolicitud");
-            entity.Property(e => e.Estatus).HasDefaultValue(1).HasColumnName("estatus");
+
+            entity.Property(e => e.Estatus)
+                .HasDefaultValue(1)
+                .HasColumnName("estatus");
+
+            entity.Property(e => e.FechaSolicitud)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("fechaSolicitud");
+
+            entity.Property(e => e.IdVenta).HasColumnName("idVenta");
+
             entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
             entity.Property(e => e.IdVenta).HasColumnName("idVenta");
 
-            entity.HasOne(d => d.IdUsuarioNavigation)
-                .WithMany(p => p.SolicitudProduccions)
+            entity.HasOne(d => d.IdVentaNavigation).WithMany(p => p.SolicitudProduccions)
+                .HasForeignKey(d => d.IdVenta)
+                .HasConstraintName("FK__Solicitud__idVen__114A936A");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.SolicitudProduccions)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("FK__Solicitud__idUsu__114A936A");
 

@@ -29,6 +29,15 @@ namespace SalsasAPI.Controllers
                                  .ToListAsync();
         }
 
+        [HttpGet("getRankingClientes")]
+        public async Task<ActionResult<IEnumerable<RankingClientes>>> GetRankingClientes()
+        {
+            // Incluye la relación de navegación con la entidad Producto
+            return await _context.RankingClientes
+                                 .Include(v => v.Usuario) // Asegúrate de que el nombre de la propiedad de navegación sea correcto
+                                 .ToListAsync();
+        }
+
 
     }
 }

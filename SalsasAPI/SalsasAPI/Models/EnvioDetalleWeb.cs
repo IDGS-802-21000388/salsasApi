@@ -3,6 +3,7 @@
     public class EnvioDetalleWeb
     {
         public int IdEnvio { get; set; }
+        public int IdVenta { get; set; }
         public int IdUsuario { get; set; }
         public string NombreCliente { get; set; }
         public string Domicilio { get; set; }

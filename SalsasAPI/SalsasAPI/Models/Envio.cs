@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SalsasAPI.Models;
 
@@ -18,8 +19,10 @@ public partial class Envio
     public int? IdVenta { get; set; }
 
     public int? IdPaqueteria { get; set; }
+    [JsonIgnore]
 
     public virtual Paqueterium? IdPaqueteriaNavigation { get; set; }
+    [JsonIgnore]
 
     public virtual Ventum? IdVentaNavigation { get; set; }
 }

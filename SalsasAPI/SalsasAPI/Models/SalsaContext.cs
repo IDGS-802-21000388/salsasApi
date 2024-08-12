@@ -323,7 +323,6 @@ public partial class SalsaContext : DbContext
             entity.ToTable("MateriaPrima");
 
             entity.Property(e => e.IdMateriaPrima).HasColumnName("idMateriaPrima");
-            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.IdMedida).HasColumnName("idMedida");
             entity.Property(e => e.IdProveedor).HasColumnName("idProveedor");
             entity.Property(e => e.NombreMateria)

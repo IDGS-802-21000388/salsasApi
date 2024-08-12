@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SalsasAPI.Models;
 
@@ -16,6 +17,7 @@ public partial class Tarjetum
     public string Cvv { get; set; } = null!;
 
     public int? IdPago { get; set; }
+    [JsonIgnore]
 
     public virtual Pago? IdPagoNavigation { get; set; }
 }

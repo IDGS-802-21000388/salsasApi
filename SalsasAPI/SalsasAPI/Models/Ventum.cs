@@ -23,4 +23,6 @@ public partial class Ventum
     public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     [JsonIgnore]
     public virtual Usuario? IdUsuarioNavigation { get; set; }
+    [JsonIgnore]
+    public virtual ICollection<SolicitudProduccion> SolicitudProduccions { get; set; } = new List<SolicitudProduccion>();
 }

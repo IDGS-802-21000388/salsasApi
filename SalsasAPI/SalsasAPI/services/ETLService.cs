@@ -34,7 +34,7 @@ namespace SalsasAPI.Services
                 try
                 {
                     // Eliminar registros anteriores
-                    context.InventarioReporte.RemoveRange(context.InventarioReporte);
+                    context.InventarioReporte.RemoveRange(context.InventarioReporte);  
                     context.RankingClientes.RemoveRange(context.RankingClientes);
                     context.VentasPorProductoPeriodos.RemoveRange(context.VentasPorProductoPeriodos);
                     context.SaveChanges();

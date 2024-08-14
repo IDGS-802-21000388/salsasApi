@@ -7,6 +7,7 @@
         public double PrecioVenta { get; set; }
         public double PrecioProduccion { get; set; }
         public double Cantidad { get; set; } 
+        public int Stock { get; set; }
         public string TipoMedida { get; set; } = null!;
         public string Fotografia { get; set; } = null!;
         public bool Estatus { get; set; }

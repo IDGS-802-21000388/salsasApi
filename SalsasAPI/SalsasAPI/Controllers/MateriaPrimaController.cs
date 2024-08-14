@@ -197,6 +197,66 @@ namespace SalsasAPI.Controllers
             }
         }
 
+        [HttpPost("{idEnvio}/descontarProductos")]
+        public async Task<IActionResult> DescontarProductos(int idEnvio)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // Obtener idVenta desde Envio
+                var envio = await _context.Envios
+                    .Where(e => e.IdEnvio == idEnvio)
+                    .Select(e => e.IdVenta)
+                    .FirstOrDefaultAsync();
+
+                if (envio == 0)
+                {
+                    return NotFound(new { text = "Envío no encontrado." });
+                }
+
+                var detallesVenta = await _context.DetalleVenta
+                    .Where(dv => dv.IdVenta == envio)
+                    .ToListAsync();
+
+                foreach (var detalle in detallesVenta)
+                {
+                    // Verificar existencia del producto
+                    var detalleProducto = await _context.DetalleProductos
+                        .Where(dp => dp.IdProducto == detalle.IdProducto && dp.FechaVencimiento >= DateTime.Now)
+                        .OrderBy(dp => dp.FechaVencimiento)
+                        .FirstOrDefaultAsync();
+
+                    if (detalleProducto == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { text = $"No hay productos disponibles para el ID {detalle.IdProducto}." });
+                    }
+
+                    // Verificar y descontar la cantidad del producto
+                    if (detalleProducto.CantidadExistentes < detalle.Cantidad)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { text = $"No hay suficiente stock para el producto {detalle.IdProducto}." });
+                    }
+
+                    detalleProducto.CantidadExistentes -= (int)detalle.Cantidad;
+                    _context.DetalleProductos.Update(detalleProducto);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Ok(new { text = "Productos descontados correctamente." });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { text = $"Error interno del servidor: {ex.Message}" });
+            }
+        }
+
+
+
 
 
 

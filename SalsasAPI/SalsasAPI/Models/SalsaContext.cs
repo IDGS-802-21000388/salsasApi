@@ -76,7 +76,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-B423Q0C;Initial Catalog=salsa;User Id=sa;Password=root;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-LRBNNN5; Initial Catalog=salsa; user id=sa; password=angel2704;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -776,6 +776,7 @@ public partial class SalsaContext : DbContext
             eb.Property(v => v.PrecioProduccion).HasColumnName("precioProduccion");
             eb.Property(v => v.NombreProducto).HasColumnName("nombreProducto");
             eb.Property(v => v.Cantidad).HasColumnName("cantidad");
+            eb.Property(v => v.Stock).HasColumnName("Stock");
             eb.Property(v => v.TipoMedida).HasColumnName("tipoMedida");
             eb.Property(v => v.Fotografia).HasColumnName("fotografia");
             eb.Property(v => v.Estatus).HasColumnName("estatus");

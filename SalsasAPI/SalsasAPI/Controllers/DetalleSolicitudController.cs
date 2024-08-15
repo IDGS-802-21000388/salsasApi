@@ -54,7 +54,7 @@ namespace SalsasAPI.Controllers
                 return NotFound();
             }
 
-            detalleSolicitud.IdSolicitud = usuario;
+            detalleSolicitud.IdUsuario = usuario;
             _context.Entry(detalleSolicitud).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

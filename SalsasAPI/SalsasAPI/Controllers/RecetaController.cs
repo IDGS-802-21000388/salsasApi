@@ -230,6 +230,95 @@ namespace SalsasAPI.Controllers
             return Ok(new { Message = "Producto eliminado correctamente" });
         }
 
+        [HttpPost("{idProducto}/agregarStock")]
+        public async Task<IActionResult> AgregarStock(int idProducto, [FromBody] int cantidadAgregar)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // Validar que el producto exista
+                var producto = await _context.Productos
+                    .Include(p => p.DetalleProductos)
+                    .FirstOrDefaultAsync(p => p.IdProducto == idProducto);
+
+                if (producto == null)
+                {
+                    return NotFound(new { text = "Producto no encontrado." });
+                }
+
+                // Obtener la receta del producto
+                var receta = await _context.Receta
+                    .Where(r => r.IdProducto == idProducto)
+                    .FirstOrDefaultAsync();
+
+                if (receta == null)
+                {
+                    return NotFound(new { text = "Receta no encontrada para el producto." });
+                }
+
+                // Verificar que hay suficiente materia prima para la cantidad a agregar
+                var detallesReceta = await _context.DetalleReceta
+                    .Where(dr => dr.IdReceta == receta.IdReceta)
+                    .ToListAsync();
+
+                foreach (var detalleReceta in detallesReceta)
+                {
+                    // Obtener la materia prima necesaria
+                    var materiaPrima = await _context.DetalleMateriaPrimas
+                        .Where(dmp => dmp.idMateriaPrima == detalleReceta.IdMateriaPrima && dmp.fechaVencimiento >= DateTime.Now)
+                        .OrderBy(dmp => dmp.fechaVencimiento)
+                        .FirstOrDefaultAsync();
+
+                    if (materiaPrima == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para {detalleReceta.IdMateriaPrima}." });
+                    }
+
+                    // Calcular la cantidad total de materia prima requerida
+                    var cantidadTotalRequerida = cantidadAgregar * detalleReceta.CantidadMateriaPrima;
+                    
+                    if (cantidadTotalRequerida > materiaPrima.cantidadExistentes)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para producir la cantidad solicitada." });
+                    }
+
+                    // Descontar la materia prima
+                    materiaPrima.cantidadExistentes -= cantidadTotalRequerida;
+                    _context.DetalleMateriaPrimas.Update(materiaPrima);
+                }
+
+                // Agregar la cantidad de producto al stock existente
+                var detalleProducto = producto.DetalleProductos.FirstOrDefault();
+                if (detalleProducto == null)
+                {
+                    detalleProducto = new DetalleProducto
+                    {
+                        IdProducto = idProducto,
+                        CantidadExistentes = 0
+                    };
+                    _context.DetalleProductos.Add(detalleProducto);
+                }
+
+                detalleProducto.CantidadExistentes += cantidadAgregar;
+                _context.DetalleProductos.Update(detalleProducto);
+
+                // Guardar los cambios
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok(new { text = "Stock agregado y materia prima descontada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { text = $"Error interno del servidor: {ex.Message}" });
+            }
+        }
+
+    
 
         public class UpdateProductoRecetaRequest
         {

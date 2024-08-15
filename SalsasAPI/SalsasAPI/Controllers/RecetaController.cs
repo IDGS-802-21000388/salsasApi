@@ -273,16 +273,16 @@ namespace SalsasAPI.Controllers
                     if (materiaPrima == null)
                     {
                         await transaction.RollbackAsync();
-                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para {detalleReceta.IdMateriaPrima}." });
+                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para la materia con id {detalleReceta.IdMateriaPrima}." });
                     }
 
                     // Calcular la cantidad total de materia prima requerida
                     var cantidadTotalRequerida = cantidadAgregar * detalleReceta.CantidadMateriaPrima;
-                    
+
                     if (cantidadTotalRequerida > materiaPrima.cantidadExistentes)
                     {
                         await transaction.RollbackAsync();
-                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para producir la cantidad solicitada." });
+                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para la materia con id {detalleReceta.IdMateriaPrima}." });
                     }
 
                     // Descontar la materia prima
@@ -318,7 +318,7 @@ namespace SalsasAPI.Controllers
             }
         }
 
-    
+
 
         public class UpdateProductoRecetaRequest
         {

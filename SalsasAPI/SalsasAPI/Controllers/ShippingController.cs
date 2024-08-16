@@ -36,8 +36,23 @@ namespace SalsasAPI.Controllers
         public async Task<IActionResult> GetEnvioDetalles()
         {
             var detalles = await _context.EnvioDetallesWeb.ToListAsync();
-            return Ok(detalles);
+
+            var estatusOrden = new Dictionary<string, int>
+    {
+                { "pendiente", 1 },
+                { "pendiente de envío", 2 },
+                { "en tránsito", 3 },
+                { "entregado", 4 }
+    };
+
+            var detallesOrdenados = detalles
+                .OrderBy(d => estatusOrden.ContainsKey(d.EstatusEnvio.ToLower()) ? estatusOrden[d.EstatusEnvio.ToLower()] : 5) 
+                .ThenBy(d => DateTime.Parse(d.FechaEnvio)) 
+                .ToList();
+
+            return Ok(detallesOrdenados);
         }
+
 
         [HttpPut("updateStatus/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)

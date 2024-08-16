@@ -93,6 +93,17 @@ namespace SalsasAPI.Controllers
                 // Obtener el idProducto generado
                 int idProducto = producto.IdProducto;
 
+                // Insertar detalle producto
+
+                var detalleProducto = new DetalleProducto
+                {
+                    IdProducto = idProducto,
+                    FechaVencimiento = DateTime.Now
+                };
+
+                _context.DetalleProductos.Add(detalleProducto);
+                await _context.SaveChangesAsync();
+
                 // Insertar la receta
                 var receta = new Recetum
                 {
@@ -262,6 +273,8 @@ namespace SalsasAPI.Controllers
                     .Where(dr => dr.IdReceta == receta.IdReceta)
                     .ToListAsync();
 
+                var materiasPrimasInsuficientes = new List<string>();
+
                 foreach (var detalleReceta in detallesReceta)
                 {
                     // Obtener la materia prima necesaria
@@ -270,24 +283,40 @@ namespace SalsasAPI.Controllers
                         .OrderBy(dmp => dmp.fechaVencimiento)
                         .FirstOrDefaultAsync();
 
-                    if (materiaPrima == null)
+                    var nomMateriaPrima = await _context.MateriaPrimas
+                        .Where(mp => mp.IdMateriaPrima == detalleReceta.IdMateriaPrima)
+                        .FirstOrDefaultAsync();
+
+                    if (materiaPrima == null || (cantidadAgregar * detalleReceta.CantidadMateriaPrima) > materiaPrima.cantidadExistentes)
                     {
-                        await transaction.RollbackAsync();
-                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para la materia con id {detalleReceta.IdMateriaPrima}." });
+                        if (nomMateriaPrima != null)
+                        {
+                            materiasPrimasInsuficientes.Add(nomMateriaPrima.NombreMateria);
+                        }
                     }
+                }
 
-                    // Calcular la cantidad total de materia prima requerida
-                    var cantidadTotalRequerida = cantidadAgregar * detalleReceta.CantidadMateriaPrima;
+                if (materiasPrimasInsuficientes.Any())
+                {
+                    await transaction.RollbackAsync();
+                    var mensaje = "No hay suficiente materia prima de: " + string.Join(", ", materiasPrimasInsuficientes);
+                    return BadRequest(new { text = mensaje });
+                }
 
-                    if (cantidadTotalRequerida > materiaPrima.cantidadExistentes)
+                // Descontar la materia prima
+                foreach (var detalleReceta in detallesReceta)
+                {
+                    var materiaPrima = await _context.DetalleMateriaPrimas
+                        .Where(dmp => dmp.idMateriaPrima == detalleReceta.IdMateriaPrima && dmp.fechaVencimiento >= DateTime.Now)
+                        .OrderBy(dmp => dmp.fechaVencimiento)
+                        .FirstOrDefaultAsync();
+
+                    if (materiaPrima != null)
                     {
-                        await transaction.RollbackAsync();
-                        return BadRequest(new { text = $"No hay suficiente materia prima disponible para la materia con id {detalleReceta.IdMateriaPrima}." });
+                        var cantidadTotalRequerida = cantidadAgregar * detalleReceta.CantidadMateriaPrima;
+                        materiaPrima.cantidadExistentes -= cantidadTotalRequerida;
+                        _context.DetalleMateriaPrimas.Update(materiaPrima);
                     }
-
-                    // Descontar la materia prima
-                    materiaPrima.cantidadExistentes -= cantidadTotalRequerida;
-                    _context.DetalleMateriaPrimas.Update(materiaPrima);
                 }
 
                 // Agregar la cantidad de producto al stock existente
@@ -297,7 +326,8 @@ namespace SalsasAPI.Controllers
                     detalleProducto = new DetalleProducto
                     {
                         IdProducto = idProducto,
-                        CantidadExistentes = 0
+                        CantidadExistentes = 0,
+                        FechaVencimiento = DateTime.Now // Inserta la fecha actual
                     };
                     _context.DetalleProductos.Add(detalleProducto);
                 }
@@ -317,6 +347,7 @@ namespace SalsasAPI.Controllers
                 return StatusCode(500, new { text = $"Error interno del servidor: {ex.Message}" });
             }
         }
+
 
 
 

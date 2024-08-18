@@ -44,7 +44,7 @@
                 if (endDate.HasValue)
                     query = query.Where(c => c.IdDetalleMateriaPrimaNavigation.fechaCompra <= endDate.Value);
 
-                var totalPurchases = await query.SumAsync(c => c.cantidadComprada * c.IdMateriaPrimaNavigation.PrecioCompra);
+                var totalPurchases = await query.SumAsync(c =>( c.cantidadComprada * c.IdMateriaPrimaNavigation.PrecioCompra)/1000);
 
                 return Ok(totalPurchases);
             }
@@ -75,7 +75,7 @@
                     .Select(g => new
                     {
                         Month = g.Key,
-                        Total = g.Sum(c => c.cantidadComprada * c.IdMateriaPrimaNavigation.PrecioCompra)
+                        Total = g.Sum(c => (c.cantidadComprada * c.IdMateriaPrimaNavigation.PrecioCompra) / 1000)
                     })
                     .ToListAsync();
 

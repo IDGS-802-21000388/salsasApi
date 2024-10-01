@@ -74,7 +74,9 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<InventarioReporte> InventarioReporte { get; set; }
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
-    
+    public virtual DbSet<AgentesVenta> AgentesVenta { get; set; }
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=DESKTOP-BBTE24L; Initial Catalog=SalsasReni; user id=sa; password=123456;TrustServerCertificate=true");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -736,6 +738,24 @@ public partial class SalsaContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Direccion");
         });
+
+        modelBuilder.Entity<AgentesVenta>(entity =>
+        {
+            entity.ToTable("AgentesVenta");
+
+            entity.HasKey(e => e.IdAgentesVenta);
+
+            entity.HasOne(e => e.Agente)
+                .WithMany()
+                .HasForeignKey(e => e.IdAgente)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Cliente)
+                .WithMany()
+                .HasForeignKey(e => e.IdCliente)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
 
 
         modelBuilder.Entity<EnvioDetalle>(eb =>

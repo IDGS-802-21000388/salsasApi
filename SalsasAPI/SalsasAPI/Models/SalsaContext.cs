@@ -738,6 +738,24 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK_Usuario_Direccion");
         });
 
+        modelBuilder.Entity<AgentesVenta>(entity =>
+        {
+            entity.ToTable("AgentesVenta");
+
+            entity.HasKey(e => e.IdAgentesVenta);
+
+            entity.HasOne(e => e.Agente)
+                .WithMany()
+                .HasForeignKey(e => e.IdAgente)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Cliente)
+                .WithMany()
+                .HasForeignKey(e => e.IdCliente)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
 
         modelBuilder.Entity<EnvioDetalle>(eb =>
         {

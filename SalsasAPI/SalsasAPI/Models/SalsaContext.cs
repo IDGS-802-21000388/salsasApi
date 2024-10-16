@@ -76,8 +76,11 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
 
     public virtual DbSet<AgentesVenta> AgentesVenta { get; set; }
-    
-    
+     
+    public virtual DbSet<EncuestaSatisfaccion> EncuestaSatisfaccion { get; set; }
+
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -155,8 +158,64 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK__Detalle_p__idPro__656C112C");
         });
 
+        modelBuilder.Entity<EncuestaSatisfaccion>(entity =>
+        {
+            entity.HasKey(e => e.IdEncuesta)
+                  .HasName("PK__EncuestaSatisfaccion__IdEncuesta");  // Nombre de la clave primaria
+
+            entity.ToTable("EncuestaSatisfaccion");  // Nombre de la tabla en la base de datos
+
+            entity.Property(e => e.IdEncuesta).HasColumnName("idEncuesta");
+            entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.IdVenta).HasColumnName("idVenta");
+
+            entity.Property(e => e.ProcesoCompra)
+                  .HasColumnName("procesoCompra")
+                  .HasColumnType("tinyint")
+                  .IsRequired();
+
+            entity.Property(e => e.SaborProducto)
+                  .HasColumnName("saborProducto")
+                  .HasColumnType("tinyint")
+                  .IsRequired();
+
+            entity.Property(e => e.EntregaProducto)
+                  .HasColumnName("entregaProducto")
+                  .HasColumnType("tinyint")
+                  .IsRequired();
+
+            entity.Property(e => e.PresentacionProducto)
+                  .HasColumnName("presentacionProducto")
+                  .HasColumnType("tinyint")
+                  .IsRequired();
+
+            entity.Property(e => e.FacilidadUsoPagina)
+                  .HasColumnName("facilidadUsoPagina")
+                  .HasColumnType("tinyint")
+                  .IsRequired();
+
+            entity.Property(e => e.FechaEncuesta)
+                  .HasColumnName("fechaEncuesta")
+                  .HasColumnType("datetime")
+                  .HasDefaultValueSql("GETDATE()") // Valor por defecto para la fecha
+                  .IsRequired();
+
+            // Configuración de claves foráneas
+            entity.HasOne(e => e.Usuario)
+                  .WithMany()
+                  .HasForeignKey(e => e.IdUsuario)
+                  .HasConstraintName("FK_Usuario_Encuesta")
+                  .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(e => e.Venta)
+                  .WithMany()
+                  .HasForeignKey(e => e.IdVenta)
+                  .HasConstraintName("FK_Venta_Encuesta")
+                  .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
         // Configuración de la tabla VentasPorProductoPeriodo
-            modelBuilder.Entity<VentasPorProductoPeriodo>(entity =>
+        modelBuilder.Entity<VentasPorProductoPeriodo>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PK_VentasPorProductoPeriodo");
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SalsasAPI.Models;
 
@@ -11,9 +12,11 @@ using SalsasAPI.Models;
 namespace SalsasAPI.Migrations
 {
     [DbContext(typeof(SalsaContext))]
-    partial class SalsaContextModelSnapshot : ModelSnapshot
+    [Migration("20241016055109_AddEncuestaSatisfacciones")]
+    partial class AddEncuestaSatisfacciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

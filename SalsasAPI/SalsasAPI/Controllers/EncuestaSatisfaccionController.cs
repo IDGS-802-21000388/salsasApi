@@ -23,20 +23,14 @@ namespace SalsasAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EncuestaSatisfaccion>>> GetEncuestas()
         {
-            return await _context.EncuestaSatisfaccion
-                                 .Include(e => e.Usuario)
-                                 .Include(e => e.Venta)
-                                 .ToListAsync();
+            return await _context.EncuestaSatisfaccion.ToListAsync();
         }
 
         // GET: api/EncuestaSatisfaccion/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EncuestaSatisfaccion>> GetEncuesta(int id)
         {
-            var encuesta = await _context.EncuestaSatisfaccion
-                                         .Include(e => e.Usuario)
-                                         .Include(e => e.Venta)
-                                         .FirstOrDefaultAsync(e => e.IdEncuesta == id);
+            var encuesta = await _context.EncuestaSatisfaccion.FirstOrDefaultAsync(e => e.IdEncuesta == id);
 
             if (encuesta == null)
             {
@@ -55,9 +49,7 @@ namespace SalsasAPI.Controllers
                 return BadRequest(new { message = "El ID de la encuesta no coincide" });
             }
 
-            var existingEncuesta = await _context.EncuestaSatisfaccion
-                                                 .FirstOrDefaultAsync(e => e.IdEncuesta == id);
-
+            var existingEncuesta = await _context.EncuestaSatisfaccion.FindAsync(id);
             if (existingEncuesta == null)
             {
                 return NotFound(new { message = "Encuesta no encontrada" });
@@ -93,6 +85,7 @@ namespace SalsasAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<EncuestaSatisfaccion>> PostEncuesta(EncuestaSatisfaccion encuesta)
         {
+            // Validación de campos obligatorios
             if (encuesta.IdUsuario <= 0)
             {
                 return BadRequest(new { message = "El campo 'Usuario' es requerido y debe ser un ID válido." });
@@ -109,7 +102,6 @@ namespace SalsasAPI.Controllers
             return CreatedAtAction(nameof(GetEncuesta), new { id = encuesta.IdEncuesta }, encuesta);
         }
 
-
         // DELETE: api/EncuestaSatisfaccion/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEncuesta(int id)
@@ -120,7 +112,7 @@ namespace SalsasAPI.Controllers
                 return NotFound();
             }
 
-            // Desactivar la encuesta en lugar de eliminarla
+            // Eliminar la encuesta
             _context.EncuestaSatisfaccion.Remove(encuesta);
             await _context.SaveChangesAsync();
 

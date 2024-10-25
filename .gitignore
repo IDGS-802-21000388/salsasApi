@@ -31,3 +31,6 @@ obj/
 
 # Ignorar el archivo de configuración appsettings.json
 SalsasAPI/SalsasAPI/appsettings.json
+SalsasAPI/SalsasAPI/appsettings.Development.json
+SalsasAPI/SalsasAPI/SalsasAPI.http
+SalsasAPI/Properties/launchSettings.json

@@ -76,6 +76,9 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<RankingClientes> RankingClientes { get; set; }
 
     public virtual DbSet<AgentesVenta> AgentesVenta { get; set; }
+     
+    public virtual DbSet<EncuestaSatisfaccion> EncuestaSatisfaccion { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -155,8 +158,39 @@ public partial class SalsaContext : DbContext
                 .HasConstraintName("FK__Detalle_p__idPro__656C112C");
         });
 
+        modelBuilder.Entity<EncuestaSatisfaccion>(entity =>
+        {
+            entity.HasKey(e => e.IdEncuesta).HasName("PK_EncuestaSatisfaccion");  // Nombre de la clave primaria
+
+            entity.ToTable("EncuestaSatisfaccion");  // Nombre de la tabla en la base de datos
+
+            entity.Property(e => e.IdEncuesta).HasColumnName("idEncuesta");
+            entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.IdVenta).HasColumnName("idVenta");
+
+            entity.Property(e => e.ProcesoCompra).HasColumnName("procesoCompra");
+            entity.Property(e => e.SaborProducto).HasColumnName("saborProducto");
+            entity.Property(e => e.EntregaProducto).HasColumnName("entregaProducto");
+            entity.Property(e => e.PresentacionProducto).HasColumnName("presentacionProducto");
+            entity.Property(e => e.FacilidadUsoPagina).HasColumnName("facilidadUsoPagina");
+            entity.Property(e => e.FechaEncuesta).HasColumnName("fechaEncuesta").HasColumnType("date");
+
+            entity.HasOne(e => e.Usuario)  // Relación con la entidad Usuario
+                  .WithMany()
+                  .HasForeignKey(e => e.IdUsuario)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_EncuestaSatisfaccion_Usuario"); ;
+
+            entity.HasOne(e => e.Venta)  // Relación con la entidad Venta
+                  .WithMany()
+                  .HasForeignKey(e => e.IdVenta)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_EncuestaSatisfaccion_Venta"); ;
+        });
+
+
         // Configuración de la tabla VentasPorProductoPeriodo
-            modelBuilder.Entity<VentasPorProductoPeriodo>(entity =>
+        modelBuilder.Entity<VentasPorProductoPeriodo>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PK_VentasPorProductoPeriodo");
 

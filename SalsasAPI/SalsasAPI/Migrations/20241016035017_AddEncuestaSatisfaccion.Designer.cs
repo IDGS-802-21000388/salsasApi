@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SalsasAPI.Models;
 
@@ -11,9 +12,11 @@ using SalsasAPI.Models;
 namespace SalsasAPI.Migrations
 {
     [DbContext(typeof(SalsaContext))]
-    partial class SalsaContextModelSnapshot : ModelSnapshot
+    [Migration("20241016035017_AddEncuestaSatisfaccion")]
+    partial class AddEncuestaSatisfaccion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -371,59 +374,6 @@ namespace SalsasAPI.Migrations
                     b.HasIndex("IdPago");
 
                     b.ToTable("Efectivo", (string)null);
-                });
-
-            modelBuilder.Entity("SalsasAPI.Models.EncuestaSatisfaccion", b =>
-                {
-                    b.Property<int>("IdEncuesta")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("idEncuesta");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdEncuesta"));
-
-                    b.Property<byte>("EntregaProducto")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("entregaProducto");
-
-                    b.Property<byte>("FacilidadUsoPagina")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("facilidadUsoPagina");
-
-                    b.Property<DateTime>("FechaEncuesta")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("fechaEncuesta")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("int")
-                        .HasColumnName("idUsuario");
-
-                    b.Property<int>("IdVenta")
-                        .HasColumnType("int")
-                        .HasColumnName("idVenta");
-
-                    b.Property<byte>("PresentacionProducto")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("presentacionProducto");
-
-                    b.Property<byte>("ProcesoCompra")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("procesoCompra");
-
-                    b.Property<byte>("SaborProducto")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("saborProducto");
-
-                    b.HasKey("IdEncuesta")
-                        .HasName("PK__EncuestaSatisfaccion__IdEncuesta");
-
-                    b.HasIndex("IdUsuario");
-
-                    b.HasIndex("IdVenta");
-
-                    b.ToTable("EncuestaSatisfaccion", (string)null);
                 });
 
             modelBuilder.Entity("SalsasAPI.Models.Envio", b =>
@@ -1600,25 +1550,6 @@ namespace SalsasAPI.Migrations
                         .HasConstraintName("FK__Efectivo__idPago__208CD6FA");
 
                     b.Navigation("IdPagoNavigation");
-                });
-
-            modelBuilder.Entity("SalsasAPI.Models.EncuestaSatisfaccion", b =>
-                {
-                    b.HasOne("SalsasAPI.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .IsRequired()
-                        .HasConstraintName("FK_Usuario_Encuesta");
-
-                    b.HasOne("SalsasAPI.Models.Ventum", "Venta")
-                        .WithMany()
-                        .HasForeignKey("IdVenta")
-                        .IsRequired()
-                        .HasConstraintName("FK_Venta_Encuesta");
-
-                    b.Navigation("Usuario");
-
-                    b.Navigation("Venta");
                 });
 
             modelBuilder.Entity("SalsasAPI.Models.Envio", b =>

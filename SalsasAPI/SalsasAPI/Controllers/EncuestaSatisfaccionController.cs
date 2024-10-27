@@ -26,6 +26,22 @@ namespace SalsasAPI.Controllers
             return await _context.EncuestaSatisfaccion.ToListAsync();
         }
 
+        // GET: api/EncuestaSatisfaccion/user/{userId}
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<EncuestaSatisfaccion>>> GetEncuestasByUserId(int userId)
+        {
+            var encuestas = await _context.EncuestaSatisfaccion
+                .Where(e => e.IdUsuario == userId)
+                .ToListAsync();
+
+            if (encuestas == null || !encuestas.Any())
+            {
+                return NotFound(new { message = "No se encontraron encuestas para este usuario." });
+            }
+
+            return encuestas;
+        }
+
         // GET: api/EncuestaSatisfaccion/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EncuestaSatisfaccion>> GetEncuesta(int id)

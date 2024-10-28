@@ -79,6 +79,9 @@ public partial class SalsaContext : DbContext
      
     public virtual DbSet<EncuestaSatisfaccion> EncuestaSatisfaccion { get; set; }
 
+    public virtual DbSet<EmailMessage> EmailMessages { get; set; }
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -876,6 +879,26 @@ public partial class SalsaContext : DbContext
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("FK_RankingClientes_Usuario");
         });
+
+        modelBuilder.Entity<EmailMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_EmailMessage");
+
+            entity.ToTable("EmailMessage");
+
+            entity.Property(e => e.Email)
+                  .IsRequired()
+                  .HasMaxLength(255);
+
+            entity.Property(e => e.Mensaje)
+                  .IsRequired()
+                  .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.FechaCreacion)
+                  .HasDefaultValueSql("GETDATE()")
+                  .HasColumnType("datetime");
+        });
+
 
         modelBuilder.Entity<Ventum>(entity =>
         {

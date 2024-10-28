@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SalsasAPI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -20,13 +21,47 @@ namespace SalsasAPI.Controllers
             _context = context;
         }
 
-        // Endpoint para enviar correos promocionales
+        // Endpoint para enviar correos promocionales y guardar en la base de datos
         [HttpPost("enviar-promocion")]
         public async Task<IActionResult> EnviarPromocion([FromBody] PromoRequest promoRequest)
         {
             var emailService = new EmailService();
             await emailService.EnviarCorreo(promoRequest.Emails, promoRequest.Mensaje);
-            return Ok(new { Message = "Promociones enviadas correctamente" });
+
+            // Guardar cada correo en la base de datos
+            foreach (var destinatario in promoRequest.Emails)
+            {
+                var emailMessage = new EmailMessage
+                {
+                    Email = destinatario,
+                    Mensaje = promoRequest.Mensaje,
+                    FechaCreacion = DateTime.Now
+                };
+
+                _context.EmailMessages.Add(emailMessage);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Promociones enviadas y guardadas correctamente" });
+        }
+
+        // Obtener todos los registros de EmailMessage
+        [HttpGet("getContactClient")]
+        public async Task<IActionResult> GetContactClient()
+        {
+            var contacts = await _context.EmailMessages.ToListAsync();
+            return Ok(contacts);
+        }
+
+        // Obtener registros de EmailMessage filtrados por email
+        [HttpGet("getContactClientByEmail")]
+        public async Task<IActionResult> GetContactClientByEmail([FromQuery] string email)
+        {
+            var contacts = await _context.EmailMessages
+                                         .Where(e => e.Email == email)
+                                         .ToListAsync();
+            return Ok(contacts);
         }
 
         // Clase para el envío de correos

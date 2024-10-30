@@ -36,4 +36,6 @@ public partial class Producto
     public virtual ICollection<Recetum> Receta { get; set; } = new List<Recetum>();
     [JsonIgnore]
     public virtual ICollection<VentasPorProductoPeriodo> VentasPorProductoPeriodos { get; set; } = new List<VentasPorProductoPeriodo>(); // Agregado
+
+    public virtual ICollection<Testimonio> Testimonios { get; set; }
 }

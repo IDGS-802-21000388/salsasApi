@@ -1,6 +1,7 @@
 ﻿using SalsasAPI.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 public class Testimonio
 {
@@ -24,9 +25,11 @@ public class Testimonio
     public int Estatus { get; set; }
 
     // Relación con Usuario y Producto
+    [JsonIgnore]
     [ForeignKey("IdUsuario")]
     public virtual Usuario Usuario { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("IdProducto")]
     public virtual Producto Producto { get; set; }
 }

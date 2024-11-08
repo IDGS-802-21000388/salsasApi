@@ -54,6 +54,9 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<Proveedor> Proveedors { get; set; }
 
+    public virtual DbSet<Testimonio> Testimonios { get; set; }
+
+
     public virtual DbSet<Recetum> Receta { get; set; }
 
     public virtual DbSet<SolicitudProduccion> SolicitudProduccions { get; set; }
@@ -82,6 +85,7 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<EmailMessage> EmailMessages { get; set; }
 
 
+    public virtual DbSet<Queja> Quejas { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -900,6 +904,61 @@ public partial class SalsaContext : DbContext
         });
 
 
+
+        modelBuilder.Entity<Testimonio>(entity =>
+        {
+            entity.HasKey(e => e.IdTestimonio).HasName("PK_Testimonio");
+
+            entity.ToTable("Testimonio");
+
+            entity.Property(e => e.IdTestimonio)
+                  .HasColumnName("idTestimonio");
+
+            entity.Property(e => e.IdUsuario)
+                  .HasColumnName("idUsuario");
+
+            entity.Property(e => e.IdProducto)
+                  .HasColumnName("idProducto");
+
+            entity.Property(e => e.Calificacion)
+                  .HasColumnName("calificacion")
+                  .IsRequired(); // Asegúrate de que la calificación sea requerida
+
+            entity.Property(e => e.Comentario)
+                  .HasColumnName("comentario")
+                  .IsRequired(); // Asegúrate de que el comentario sea requerido
+
+            entity.Property(e => e.FechaTestimonio)
+                  .HasColumnType("datetime")
+                  .HasDefaultValueSql("(getdate())")
+                  .HasColumnName("fechaTestimonio");
+
+            entity.HasOne(d => d.Usuario)
+                  .WithMany(p => p.Testimonios)
+                  .HasForeignKey(d => d.IdUsuario)
+                  .OnDelete(DeleteBehavior.Cascade) // Comportamiento al eliminar un usuario
+                  .HasConstraintName("FK_Testimonio_Usuario");
+
+            entity.HasOne(d => d.Producto)
+                  .WithMany(p => p.Testimonios)
+                  .HasForeignKey(d => d.IdProducto)
+                  .OnDelete(DeleteBehavior.Cascade) // Comportamiento al eliminar un producto
+                  .HasConstraintName("FK_Testimonio_Producto");
+        });
+
+        modelBuilder.Entity<Queja>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Contenido).IsRequired();
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime").IsRequired();
+            entity.Property(e => e.Estado).HasMaxLength(50).HasDefaultValue("Nueva");
+
+            entity.HasOne(q => q.Usuario)
+                .WithMany(u => u.Quejas)
+                .HasForeignKey(q => q.IdUsuario)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    
         modelBuilder.Entity<Ventum>(entity =>
         {
             entity.HasKey(e => e.IdVenta).HasName("PK__Venta__077D56146F550EF7");

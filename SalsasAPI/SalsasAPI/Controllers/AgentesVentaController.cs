@@ -21,12 +21,43 @@ namespace SalsasAPI.Controllers
             _context = context;
         }
 
-        // GET: api/agentesventa
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AgentesVenta>>> GetAgentesVenta()
+        public async Task<ActionResult<IEnumerable<object>>> GetAgentesVenta()
         {
-            return await _context.AgentesVenta.ToListAsync();
+            var agentesVenta = await _context.AgentesVenta
+                .Include(av => av.Agente) // Incluir el agente
+                .ThenInclude(a => a.Direccion) // Incluir la dirección del agente
+                .Include(av => av.Cliente) // Incluir el cliente
+                .ThenInclude(c => c.Direccion) // Incluir la dirección del cliente
+                .Select(av => new
+                {
+                    av.IdAgentesVenta,
+                    // Información del Agente
+                    IdUsuarioAgente = av.Agente.IdUsuario, // Incluir el idUsuario del agente
+                    NombreAgente = av.Agente.Nombre,
+                    CorreoAgente = av.Agente.Correo,
+                    TelefonoAgente = av.Agente.Telefono,
+                    DireccionAgente = av.Agente.Direccion.Calle + " " + av.Agente.Direccion.NumExt +
+                                      (av.Agente.Direccion.NumInt != null ? " Int " + av.Agente.Direccion.NumInt : "") + ", " +
+                                      av.Agente.Direccion.Colonia + ", " +
+                                      av.Agente.Direccion.Municipio + ", " +
+                                      av.Agente.Direccion.Estado + ", C.P. " + av.Agente.Direccion.CodigoPostal,
+                    // Información del Cliente
+                    NombreCliente = av.Cliente.Nombre,
+                    CorreoCliente = av.Cliente.Correo,
+                    TelefonoCliente = av.Cliente.Telefono,
+                    DireccionCliente = av.Cliente.Direccion.Calle + " " + av.Cliente.Direccion.NumExt +
+                                      (av.Cliente.Direccion.NumInt != null ? " Int " + av.Cliente.Direccion.NumInt : "") + ", " +
+                                      av.Cliente.Direccion.Colonia + ", " +
+                                      av.Cliente.Direccion.Municipio + ", " +
+                                      av.Cliente.Direccion.Estado + ", C.P. " + av.Cliente.Direccion.CodigoPostal
+                })
+                .ToListAsync();
+
+            return Ok(agentesVenta);
         }
+
+
 
         // GET: api/agentesventa/5
         [HttpGet("{id}")]

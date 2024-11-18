@@ -87,6 +87,11 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<Queja> Quejas { get; set; }
 
+    public virtual DbSet<Cotizaciones> Cotizaciones { get; set; }
+    public virtual DbSet<DetalleCotizacion> DetalleCotizaciones { get; set; }
+    public virtual DbSet<vw_Cotizacion> VistaCotizaciones { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -975,6 +980,65 @@ public partial class SalsaContext : DbContext
                 .WithMany(p => p.Ventas)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("FK_Venta_Usuario");
+        });
+
+        // Configuración de la tabla Cotizaciones
+        modelBuilder.Entity<Cotizaciones>(entity =>
+        {
+            entity.HasKey(e => e.IdCotizacion).HasName("PK_Cotizaciones");
+
+            entity.ToTable("Cotizaciones");
+
+            entity.Property(e => e.IdCotizacion).HasColumnName("idCotizacion");
+            entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.emailCliente).HasColumnName("emailCliente");
+            entity.Property(e => e.FechaCreacion)
+                  .HasDefaultValueSql("(getdate())")
+                  .HasColumnType("datetime")
+                  .HasColumnName("fechaCreacion");
+            entity.Property(e => e.Subtotal).HasColumnName("subtotal");
+            entity.Property(e => e.Iva).HasColumnName("iva");
+            entity.Property(e => e.Total).HasColumnName("total");
+            entity.Property(e => e.Atendida).HasColumnName("atendida");
+        });
+
+        // Configuración de la tabla DetalleCotizaciones
+        modelBuilder.Entity<DetalleCotizacion>(entity =>
+        {
+            entity.HasKey(e => e.IdDetalle).HasName("PK_DetalleCotizaciones");
+
+            entity.ToTable("DetalleCotizaciones");
+
+            entity.Property(e => e.IdDetalle).HasColumnName("idDetalle");
+            entity.Property(e => e.IdCotizacion).HasColumnName("idCotizacion");
+            entity.Property(e => e.Descripcion)
+                  .IsRequired()
+                  .HasMaxLength(255)
+                  .HasColumnName("descripcion");
+            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
+            entity.Property(e => e.PrecioUnitario).HasColumnName("precioUnitario");
+            entity.Property(e => e.Total).HasColumnName("total");
+        });
+
+        // Configuración de la vista VistaCotizaciones
+        modelBuilder.Entity<vw_Cotizacion>(entity =>
+        {
+            entity.HasNoKey(); 
+            entity.ToView("VistaCotizaciones");
+
+            entity.Property(e => e.IdCotizacion).HasColumnName("idCotizacion");
+            entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.Atendida).HasColumnName("atendida");
+            entity.Property(e => e.EmailCliente).HasColumnName("emailCliente");
+            entity.Property(e => e.FechaCreacion).HasColumnName("fechaCreacion");
+            entity.Property(e => e.Subtotal).HasColumnName("subtotal");
+            entity.Property(e => e.Iva).HasColumnName("iva");
+            entity.Property(e => e.TotalCotizacion).HasColumnName("totalCotizacion");
+            entity.Property(e => e.IdDetalle).HasColumnName("idDetalle");
+            entity.Property(e => e.Descripcion).HasColumnName("descripcion");
+            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
+            entity.Property(e => e.PrecioUnitario).HasColumnName("precioUnitario");
+            entity.Property(e => e.TotalDetalle).HasColumnName("totalDetalle");
         });
 
         OnModelCreatingPartial(modelBuilder);

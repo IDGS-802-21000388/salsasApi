@@ -348,6 +348,23 @@ namespace SalsasAPI.Controllers
             }
         }
 
+        [HttpGet("calcularPrecioProduccion/{idMateriaPrima}/{cantidad}")]
+        public async Task<IActionResult> CalcularPrecioProduccion(int idMateriaPrima, int cantidad)
+        {
+            // Consulta la base de datos para obtener el precio de compra de la materia prima
+            var materiaPrima = await _context.MateriaPrimas.FindAsync(idMateriaPrima);
+            if (materiaPrima == null)
+            {
+                return NotFound("Materia prima no encontrada.");
+            }
+
+            // Calcula el costo de producción
+            var costoProduccion = (materiaPrima.PrecioCompra * cantidad) / 1000;
+
+            // Devuelve el resultado
+            return Ok(new { CostoProduccion = costoProduccion });
+        }
+
 
 
 

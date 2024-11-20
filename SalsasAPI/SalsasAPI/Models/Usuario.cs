@@ -36,4 +36,10 @@ public partial class Usuario
     public virtual ICollection<Ventum> Ventas { get; set; } = new List<Ventum>();
     [JsonIgnore]
     public virtual ICollection<RankingClientes> RankingClientes { get; set; } = new List<RankingClientes>();
+    [JsonIgnore]
+    public virtual ICollection<Testimonio> Testimonios { get; set; } = new List<Testimonio>();
+
+    [JsonIgnore]
+    public ICollection<Queja> Quejas { get; set; } = new List<Queja>();
+
 }

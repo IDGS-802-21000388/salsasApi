@@ -91,10 +91,31 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<DetalleCotizacion> DetalleCotizaciones { get; set; }
     public virtual DbSet<vw_Cotizacion> VistaCotizaciones { get; set; }
 
+    public DbSet<Empresa> Empresa { get; set; }
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        // Configuración explícita de la clave primaria
+        modelBuilder.Entity<Empresa>()
+            .HasKey(e => e.IdEmpresa);  // Definir IdEmpresa como clave primaria
+
+        // Relación entre Empresa y Usuario
+        modelBuilder.Entity<Empresa>()
+            .HasOne(e => e.Usuario) // Una Empresa tiene un Usuario
+            .WithMany() // Un Usuario puede tener muchas Empresas
+            .HasForeignKey(e => e.IdUsuario) // La clave foránea en la tabla Empresa
+            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina el Usuario
+
+        // Relación entre Empresa y Direccion
+        modelBuilder.Entity<Empresa>()
+            .HasOne(e => e.Direccion) // Una Empresa tiene una Direccion
+            .WithMany() // Una Direccion puede tener muchas Empresas
+            .HasForeignKey(e => e.IdDireccion) // La clave foránea en la tabla Empresa
+            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina la Direccion
 
         modelBuilder.Entity<EnvioDetalleWeb>(entity =>
         {

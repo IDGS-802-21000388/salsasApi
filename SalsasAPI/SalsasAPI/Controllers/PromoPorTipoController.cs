@@ -78,7 +78,7 @@ namespace SalsasAPI.Controllers
                 }
 
                 email.Subject = "Promociones de Salsas Reni";
-                email.Body = new TextPart("plain")
+                email.Body = new TextPart("html")
                 {
                     Text = mensaje
                 };

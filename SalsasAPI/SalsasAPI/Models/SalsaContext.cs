@@ -90,11 +90,34 @@ public partial class SalsaContext : DbContext
     public virtual DbSet<Cotizaciones> Cotizaciones { get; set; }
     public virtual DbSet<DetalleCotizacion> DetalleCotizaciones { get; set; }
     public virtual DbSet<vw_Cotizacion> VistaCotizaciones { get; set; }
+    public virtual DbSet<CodigoDescuento> CodigosDescuento { get; set; }
+    public virtual DbSet<UsuarioCodigoDescuento> UsuarioCodigoDescuento { get; set; }
+
+    public DbSet<Empresa> Empresa { get; set; }
+
 
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        // Configuración explícita de la clave primaria
+        modelBuilder.Entity<Empresa>()
+            .HasKey(e => e.IdEmpresa);  // Definir IdEmpresa como clave primaria
+
+        // Relación entre Empresa y Usuario
+        modelBuilder.Entity<Empresa>()
+            .HasOne(e => e.Usuario) // Una Empresa tiene un Usuario
+            .WithMany() // Un Usuario puede tener muchas Empresas
+            .HasForeignKey(e => e.IdUsuario) // La clave foránea en la tabla Empresa
+            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina el Usuario
+
+        // Relación entre Empresa y Direccion
+        modelBuilder.Entity<Empresa>()
+            .HasOne(e => e.Direccion) // Una Empresa tiene una Direccion
+            .WithMany() // Una Direccion puede tener muchas Empresas
+            .HasForeignKey(e => e.IdDireccion) // La clave foránea en la tabla Empresa
+            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina la Direccion
 
         modelBuilder.Entity<EnvioDetalleWeb>(entity =>
         {
@@ -1019,6 +1042,64 @@ public partial class SalsaContext : DbContext
             entity.Property(e => e.PrecioUnitario).HasColumnName("precioUnitario");
             entity.Property(e => e.Total).HasColumnName("total");
         });
+
+        modelBuilder.Entity<CodigoDescuento>(entity =>
+        {
+            entity.HasKey(e => e.IdCodigo).HasName("PK_CodigoDescuento");
+
+            entity.ToTable("CodigoDescuento");
+
+            entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
+            entity.Property(e => e.Codigo)
+                  .IsRequired()
+                  .HasMaxLength(50)
+                  .HasColumnName("codigo");
+            entity.Property(e => e.Descripcion)
+                  .IsRequired()
+                  .HasMaxLength(255)
+                  .HasColumnName("descripcion");
+            entity.Property(e => e.DescuentoPorcentaje).HasColumnName("descuentoPorcentaje");
+            entity.Property(e => e.DescuentoMonto).HasColumnName("descuentoMonto");
+            entity.Property(e => e.FechaInicio)
+                  .HasColumnType("datetime")
+                  .HasColumnName("fechaInicio");
+            entity.Property(e => e.FechaFin)
+                  .HasColumnType("datetime")
+                  .HasColumnName("fechaFin");
+            entity.Property(e => e.CantidadMaxima).HasColumnName("cantidadMaxima");
+            entity.Property(e => e.CantidadUsada).HasColumnName("cantidadUsada");
+            entity.Property(e => e.Estatus).HasColumnName("estatus");
+        });
+
+        modelBuilder.Entity<UsuarioCodigoDescuento>(entity =>
+        {
+            entity.HasKey(e => e.IdUsuarioCodigo).HasName("PK_UsuarioCodigoDescuento");
+
+            entity.ToTable("UsuarioCodigoDescuento");
+
+            entity.Property(e => e.IdUsuarioCodigo).HasColumnName("idUsuarioCodigo");
+            entity.Property(e => e.IdUsuario).HasColumnName("idUsuario");
+            entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
+            entity.Property(e => e.FechaAsignacion)
+                  .HasDefaultValueSql("(getdate())")
+                  .HasColumnType("datetime")
+                  .HasColumnName("fechaAsignacion");
+            entity.Property(e => e.Usado)
+                  .IsRequired()
+                  .HasDefaultValue(false)
+                  .HasColumnName("usado");
+
+            entity.HasOne(d => d.Usuario)
+                  .WithMany(p => p.UsuarioCodigoDescuentos)
+                  .HasForeignKey(d => d.IdUsuario)
+                  .HasConstraintName("FK_UsuarioCodigoDescuento_Usuario");
+
+            entity.HasOne(d => d.CodigoDescuento)
+                  .WithMany(p => p.UsuarioCodigoDescuentos)
+                  .HasForeignKey(d => d.IdCodigo)
+                  .HasConstraintName("FK_UsuarioCodigoDescuento_CodigoDescuento");
+        });
+
 
         // Configuración de la vista VistaCotizaciones
         modelBuilder.Entity<vw_Cotizacion>(entity =>

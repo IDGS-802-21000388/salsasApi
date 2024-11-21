@@ -25,15 +25,14 @@ namespace SalsasAPI.Controllers
         public async Task<ActionResult<IEnumerable<object>>> GetAgentesVenta()
         {
             var agentesVenta = await _context.AgentesVenta
-                .Include(av => av.Agente) // Incluir el agente
-                .ThenInclude(a => a.Direccion) // Incluir la dirección del agente
-                .Include(av => av.Cliente) // Incluir el cliente
-                .ThenInclude(c => c.Direccion) // Incluir la dirección del cliente
+                .Include(av => av.Agente) 
+                .ThenInclude(a => a.Direccion) 
+                .Include(av => av.Cliente) 
+                .ThenInclude(c => c.Direccion) 
                 .Select(av => new
                 {
                     av.IdAgentesVenta,
-                    // Información del Agente
-                    IdUsuarioAgente = av.Agente.IdUsuario, // Incluir el idUsuario del agente
+                    IdUsuarioAgente = av.Agente.IdUsuario,
                     NombreAgente = av.Agente.Nombre,
                     CorreoAgente = av.Agente.Correo,
                     TelefonoAgente = av.Agente.Telefono,
@@ -42,7 +41,6 @@ namespace SalsasAPI.Controllers
                                       av.Agente.Direccion.Colonia + ", " +
                                       av.Agente.Direccion.Municipio + ", " +
                                       av.Agente.Direccion.Estado + ", C.P. " + av.Agente.Direccion.CodigoPostal,
-                    // Información del Cliente
                     NombreCliente = av.Cliente.Nombre,
                     CorreoCliente = av.Cliente.Correo,
                     TelefonoCliente = av.Cliente.Telefono,

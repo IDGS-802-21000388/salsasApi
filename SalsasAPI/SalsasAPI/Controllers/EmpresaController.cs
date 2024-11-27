@@ -1,152 +1,175 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalsasAPI.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SalsasAPI.Models;
 
-namespace TuApp.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class EmpresaController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EmpresaController : ControllerBase
+    private readonly SalsaContext _context;
+
+    public EmpresaController(SalsaContext context)
     {
-        private readonly SalsaContext _context;
+        _context = context;
+    }
 
-        public EmpresaController(SalsaContext context)
+    // GET: api/empresa
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Empresa>>> GetEmpresas()
+    {
+        var empresas = await _context.Empresa
+            .Include(e => e.Direccion) // Incluir la dirección de la empresa
+            .ToListAsync();
+
+        return empresas;
+    }
+
+    // GET: api/empresa/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Empresa>> GetEmpresa(int id)
+    {
+        var empresa = await _context.Empresa
+            .Include(e => e.Direccion) // Incluir la dirección de la empresa
+            .FirstOrDefaultAsync(e => e.idEmpresa == id);
+
+        if (empresa == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        // GET: api/Empresa
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Empresa>>> GetEmpresas()
+        return empresa;
+    }
+
+
+
+    // POST: api/empresa
+    [HttpPost]
+    public async Task<ActionResult<Empresa>> CreateEmpresa(Empresa empresa)
+    {
+        // Verificar si la empresa ya existe
+        if (_context.Empresa.Any(e => e.nombre == empresa.nombre))
         {
+            return BadRequest("La empresa ya existe.");
+        }
+
+        // Agregar la empresa
+        _context.Empresa.Add(empresa);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetEmpresa), new { id = empresa.idEmpresa }, empresa);
+    }
+
+    // PUT: api/empresa/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateEmpresa(int id, Empresa empresa)
+    {
+        if (id != empresa.idEmpresa)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(empresa).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmpresaExists(id))
+            {
+                return NotFound();
+            }
+            throw;
+        }
+
+        return NoContent();
+    }
+
+    // DELETE: api/empresa/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteEmpresa(int id)
+    {
+        var empresa = await _context.Empresa.FindAsync(id);
+        if (empresa == null)
+        {
+            return NotFound();
+        }
+
+        _context.Empresa.Remove(empresa);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpGet]
+    [Route("api/empresa-con-usuarios")]
+    public async Task<IActionResult> GetEmpresasConUsuarios()
+    {
+        try
+        {
+            // Obtener las empresas e incluir la dirección
             var empresas = await _context.Empresa
-                                         .Include(e => e.Usuario)    // Incluye los datos de Usuario relacionados con la Empresa
-                                         .ThenInclude(u => u.Direccion)  // Incluye la Dirección relacionada con el Usuario
-                                         .Include(e => e.Direccion)  // Incluye los datos de Direccion relacionados con la Empresa
-                                         .ToListAsync();  // Recupera todas las empresas con los datos relacionados
+                .Include(e => e.Direccion) // Incluir la dirección de cada empresa
+                .ToListAsync();
 
-            return Ok(empresas);  // Devuelve el resultado como una lista
-        }
+            // Crear una lista para el resultado
+            var resultado = new List<object>();
 
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Empresa>> GetEmpresa(int id)
-        {
-            var empresa = await _context.Empresa
-                .Include(e => e.Usuario)  // Incluye el Usuario relacionado con la Empresa
-                    .ThenInclude(u => u.Direccion)  // Incluye la Dirección del Usuario
-                .Include(e => e.Direccion)  // Incluye la Dirección de la Empresa
-                .FirstOrDefaultAsync(e => e.IdEmpresa == id);  // Filtra por el Id de la Empresa
-
-            if (empresa == null)
+            foreach (var empresa in empresas)
             {
-                return NotFound();
-            }
+                // Obtener los usuarios relacionados a través de EmpresaUsuario
+                var usuarios = await _context.EmpresaUsuario
+                    .Where(eu => eu.IdEmpresa == empresa.idEmpresa)
+                    .Join(_context.Usuarios,
+                          eu => eu.IdUsuario,
+                          u => u.IdUsuario,
+                          (eu, u) => new
+                          {
+                              u.IdUsuario,
+                              u.Nombre,
+                              u.Correo,
+                              u.Telefono
+                          })
+                    .ToListAsync();
 
-            return Ok(empresa);  // Retorna la empresa con sus datos incluidos
-        }
-
-
-
-        [HttpPost]
-        public async Task<ActionResult<Empresa>> PostEmpresa([FromBody] EmpresaDto empresaDto)
-        {
-            if (empresaDto == null)
-            {
-                return BadRequest("Datos de la empresa no válidos");
-            }
-
-            // Crear una nueva dirección a partir del DTO de la dirección
-            var direccion = new Direccion
-            {
-                Estado = empresaDto.Direccion.Estado,
-                Municipio = empresaDto.Direccion.Municipio,
-                CodigoPostal = empresaDto.Direccion.CodigoPostal,
-                Colonia = empresaDto.Direccion.Colonia,
-                Calle = empresaDto.Direccion.Calle,
-                NumExt = empresaDto.Direccion.NumExt,
-                NumInt = empresaDto.Direccion.NumInt,
-                Referencia = empresaDto.Direccion.Referencia
-            };
-
-            // Agregar la dirección al contexto
-            _context.Direccion.Add(direccion);
-            await _context.SaveChangesAsync(); // Guardar la dirección para obtener el Id
-
-            // Crear la empresa con el IdUsuario y el IdDireccion recién creado
-            var empresa = new Empresa
-            {
-                Nombre = empresaDto.Nombre,
-                Telefono = empresaDto.Telefono,
-                IdUsuario = empresaDto.IdUsuario,  // Solo asignamos el idUsuario
-                IdDireccion = direccion.IdDireccion // Asignamos el IdDireccion de la nueva dirección
-            };
-
-            // Agregar la empresa al contexto de la base de datos
-            _context.Empresa.Add(empresa);
-            await _context.SaveChangesAsync();
-
-            // Devuelve la empresa recién creada con su Id
-            return CreatedAtAction("GetEmpresa", new { id = empresa.IdEmpresa }, empresa);
-        }
-
-
-
-
-        // PUT: api/Empresa/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmpresa(int id, Empresa empresa)
-        {
-            if (id != empresa.IdEmpresa)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(empresa).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmpresaExists(id))
+                // Agregar la empresa, su dirección y sus usuarios al resultado
+                resultado.Add(new
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    empresa.idEmpresa,
+                    empresa.nombre,
+                    empresa.telefono,
+                    Direccion = empresa.Direccion == null ? null : new
+                    {
+                        empresa.Direccion.IdDireccion,
+                        empresa.Direccion.Estado,
+                        empresa.Direccion.Municipio,
+                        empresa.Direccion.CodigoPostal,
+                        empresa.Direccion.Colonia,
+                        empresa.Direccion.Calle,
+                        empresa.Direccion.NumExt,
+                        empresa.Direccion.NumInt,
+                        empresa.Direccion.Referencia
+                    },
+                    Usuarios = usuarios
+                });
             }
 
-            return NoContent();
+            return Ok(resultado);
         }
-
-        // DELETE: api/Empresa/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmpresa(int id)
+        catch (Exception ex)
         {
-            var empresa = await _context.Empresa.FindAsync(id);
-            if (empresa == null)
-            {
-                return NotFound();
-            }
-
-            _context.Empresa.Remove(empresa);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // Método auxiliar para verificar si una empresa existe
-        private bool EmpresaExists(int id)
-        {
-            return _context.Empresa.Any(e => e.IdEmpresa == id);
+            return StatusCode(500, $"Error al obtener datos: {ex.Message}");
         }
     }
+
+
+
+
+    private bool EmpresaExists(int id)
+    {
+        return _context.Empresa.Any(e => e.idEmpresa == id);
+    }
+
+   
 }

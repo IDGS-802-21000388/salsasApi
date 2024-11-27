@@ -43,6 +43,6 @@ public partial class Usuario
     public ICollection<Queja> Quejas { get; set; } = new List<Queja>();
 
     [JsonIgnore]
-    public virtual ICollection<UsuarioCodigoDescuento> UsuarioCodigoDescuentos { get; set; } = new List<UsuarioCodigoDescuento>();
+    public virtual ICollection<UsuarioCodigoDescuento> UsuarioCodigoDescuentos { get; set; } = new List<UsuarioCodigoDescuento>();    
 
 }

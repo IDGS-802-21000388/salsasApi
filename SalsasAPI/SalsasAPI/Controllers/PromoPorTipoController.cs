@@ -46,6 +46,30 @@ namespace SalsasAPI.Controllers
             return Ok(new { Message = "Promociones enviadas y guardadas correctamente" });
         }
 
+        [HttpPost("enviar-ticket")]
+        public async Task<IActionResult> EnviarTicket([FromBody] PromoRequest promoRequest)
+        {
+            var emailService = new EmailService();
+            await emailService.EnviarCorreo(promoRequest.Emails, promoRequest.Mensaje);
+
+            // Guardar cada correo en la base de datos
+            foreach (var destinatario in promoRequest.Emails)
+            {
+                var emailMessage = new EmailMessage
+                {
+                    Email = destinatario,
+                    Mensaje = "Ticket enviado a " + destinatario,
+                    FechaCreacion = DateTime.Now
+                };
+
+                _context.EmailMessages.Add(emailMessage);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Promociones enviadas y guardadas correctamente" });
+        }
+
         // Obtener todos los registros de EmailMessage
         [HttpGet("getContactClient")]
         public async Task<IActionResult> GetContactClient()
@@ -78,7 +102,7 @@ namespace SalsasAPI.Controllers
                 }
 
                 email.Subject = "Promociones de Salsas Reni";
-                email.Body = new TextPart("plain")
+                email.Body = new TextPart("html")
                 {
                     Text = mensaje
                 };

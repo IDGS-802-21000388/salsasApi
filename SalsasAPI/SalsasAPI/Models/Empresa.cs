@@ -1,13 +1,13 @@
-﻿namespace SalsasAPI.Models
+﻿using SalsasAPI.Models;
+
+public class Empresa
 {
-    public class Empresa
-    {
-        public int IdEmpresa { get; set; }
-        public string Nombre { get; set; }
-        public string Telefono { get; set; }
-        public int IdUsuario { get; set; }
-        public Usuario Usuario { get; set; }
-        public int IdDireccion { get; set; }
-        public Direccion Direccion { get; set; }
-    }
+    public int idEmpresa { get; set; }
+    public string nombre { get; set; }
+    public string telefono { get; set; }
+
+    // Relación con Direccion
+    public int idDireccion { get; set; }  // Asegúrate de que esta propiedad coincide con la columna en la base de datos
+    public Direccion Direccion { get; set; }  // La propiedad de navegación a la entidad Direccion
+
 }

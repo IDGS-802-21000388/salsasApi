@@ -87,37 +87,51 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<Queja> Quejas { get; set; }
 
+    public virtual DbSet<QuejasV2> QuejasV2 { get; set; }
+
+    public virtual DbSet<SeguimientoQueja> SeguimientoQueja { get; set; }
+
+
     public virtual DbSet<Cotizaciones> Cotizaciones { get; set; }
     public virtual DbSet<DetalleCotizacion> DetalleCotizaciones { get; set; }
     public virtual DbSet<vw_Cotizacion> VistaCotizaciones { get; set; }
     public virtual DbSet<CodigoDescuento> CodigosDescuento { get; set; }
     public virtual DbSet<UsuarioCodigoDescuento> UsuarioCodigoDescuento { get; set; }
 
+
+
     public DbSet<Empresa> Empresa { get; set; }
-
-
-
+    public DbSet<EmpresaUsuario> EmpresaUsuario { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Relación entre Empresa y EmpresaUsuario
+        modelBuilder.Entity<EmpresaUsuario>()
+            .HasOne<Empresa>()                        // Relación con la entidad Empresa
+            .WithMany()                               // No es necesario definir una colección en Empresa
+            .HasForeignKey(eu => eu.IdEmpresa)        // Clave foránea en EmpresaUsuario
+            .OnDelete(DeleteBehavior.Restrict);      // Evitar eliminación en cascada
 
-        // Configuración explícita de la clave primaria
-        modelBuilder.Entity<Empresa>()
-            .HasKey(e => e.IdEmpresa);  // Definir IdEmpresa como clave primaria
+        // Relación entre Usuario y EmpresaUsuario
+        modelBuilder.Entity<EmpresaUsuario>()
+            .HasOne<Usuario>()                       // Relación con la entidad Usuario
+            .WithMany()                               // No es necesario definir una colección en Usuario
+            .HasForeignKey(eu => eu.IdUsuario)       // Clave foránea en EmpresaUsuario
+            .OnDelete(DeleteBehavior.Restrict);      // Evitar eliminación en cascada
 
-        // Relación entre Empresa y Usuario
+        // Configurar la clave primaria para la tabla Empresa
         modelBuilder.Entity<Empresa>()
-            .HasOne(e => e.Usuario) // Una Empresa tiene un Usuario
-            .WithMany() // Un Usuario puede tener muchas Empresas
-            .HasForeignKey(e => e.IdUsuario) // La clave foránea en la tabla Empresa
-            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina el Usuario
+            .HasKey(e => e.idEmpresa);
 
-        // Relación entre Empresa y Direccion
+        // Configurar la clave primaria para la tabla EmpresaUsuario
+        modelBuilder.Entity<EmpresaUsuario>()
+            .HasKey(eu => eu.IdEmpresaUsuario);
+
         modelBuilder.Entity<Empresa>()
-            .HasOne(e => e.Direccion) // Una Empresa tiene una Direccion
-            .WithMany() // Una Direccion puede tener muchas Empresas
-            .HasForeignKey(e => e.IdDireccion) // La clave foránea en la tabla Empresa
-            .OnDelete(DeleteBehavior.Cascade); // Se elimina la Empresa si se elimina la Direccion
+        .HasOne(e => e.Direccion)
+        .WithMany() // O Many-to-Many si hay una relación inversa
+        .HasForeignKey(e => e.idDireccion);  // La clave foránea en la tabla Empresa
+
 
         modelBuilder.Entity<EnvioDetalleWeb>(entity =>
         {
@@ -986,7 +1000,51 @@ public partial class SalsaContext : DbContext
                 .HasForeignKey(q => q.IdUsuario)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-    
+
+        modelBuilder.Entity<QuejasV2>(entity =>
+        {
+            entity.HasKey(q => q.Id);
+            entity.Property(q => q.Contenido).IsRequired();
+            entity.Property(q => q.FechaCreacion).HasColumnType("datetime").IsRequired();
+            entity.Property(q => q.Estado).HasMaxLength(50).HasDefaultValue("Nueva");
+           
+
+            entity.HasOne(q => q.Usuario)
+                .WithMany(u => u.QuejasV2)
+                .HasForeignKey(q => q.IdUsuario)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(q => q.Seguimientos)
+                .WithOne(s => s.Queja)
+                .HasForeignKey(s => s.IdQueja)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SeguimientoQueja>(entity =>
+        {
+            entity.HasKey(s => s.IdSeguimiento);
+
+            entity.Property(s => s.Accion)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(s => s.Comentario)
+                .HasMaxLength(500);
+
+            entity.Property(s => s.FechaAccion)
+                .HasColumnType("datetime")
+                .IsRequired();
+
+            // Relación con QuejasV2
+            entity.HasOne(s => s.Queja)
+                .WithMany(q => q.Seguimientos)
+                .HasForeignKey(s => s.IdQueja)
+                .OnDelete(DeleteBehavior.Cascade);
+
+          
+        });
+
+
         modelBuilder.Entity<Ventum>(entity =>
         {
             entity.HasKey(e => e.IdVenta).HasName("PK__Venta__077D56146F550EF7");

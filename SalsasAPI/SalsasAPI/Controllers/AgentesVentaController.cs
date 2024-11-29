@@ -96,6 +96,20 @@ namespace SalsasAPI.Controllers
 
             return NoContent();
         }
+        [HttpGet("basic")]
+        public async Task<ActionResult<IEnumerable<object>>> GetBasicAgentesVenta()
+        {
+            var agentesVenta = await _context.AgentesVenta
+                .Select(av => new
+                {
+                    av.IdAgentesVenta,
+                    av.IdAgente,
+                    av.IdCliente
+                })
+                .ToListAsync();
+
+            return Ok(agentesVenta);
+        }
 
         // Método privado para verificar si existe el agente
         private bool AgenteVentaExists(int id)

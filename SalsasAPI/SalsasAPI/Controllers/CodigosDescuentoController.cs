@@ -199,6 +199,7 @@ namespace SalsasAPI.Controllers
                 {
                     ucd.IdUsuarioCodigo,
                     Codigo = ucd.CodigoDescuento.Codigo,
+                    idCodigo = ucd.IdCodigo,
                     Descripcion = ucd.CodigoDescuento.Descripcion,
                     FechaInicio = ucd.CodigoDescuento.FechaInicio,
                     FechaFin = ucd.CodigoDescuento.FechaFin,
@@ -345,6 +346,53 @@ namespace SalsasAPI.Controllers
 
             return Ok(usuarios);
         }
+
+        //11. Obtener todos los datos de las tablas CodigosDescuento y UsuarioCodigoDescuento
+        [HttpGet("ObtenerDatosTablas")]
+        public async Task<IActionResult> ObtenerDatosTablas()
+        {
+            var codigos = await _context.CodigosDescuento.ToListAsync();
+            var usuarioCodigos = await _context.UsuarioCodigoDescuento
+                .Include(ucd => ucd.CodigoDescuento)
+                .Include(ucd => ucd.Usuario)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                CodigosDescuento = codigos,
+                UsuarioCodigoDescuento = usuarioCodigos
+            });
+        }
+
+        // 10. Modificar el estatus de un código o asignación
+        [HttpPut("ModificarEstatus")]
+        public async Task<IActionResult> ModificarEstatus([FromQuery] int idCodigo, [FromQuery] bool? nuevoEstatusCodigo, [FromQuery] int? idUsuarioCodigo, [FromQuery] bool? nuevoEstatusUsuarioCodigo)
+        {
+            if (idCodigo > 0 && nuevoEstatusCodigo.HasValue)
+            {
+                var codigo = await _context.CodigosDescuento.FindAsync(idCodigo);
+                if (codigo == null)
+                    return NotFound("Código de descuento no encontrado.");
+
+                codigo.Estatus = nuevoEstatusCodigo.Value;
+                _context.CodigosDescuento.Update(codigo);
+            }
+
+            if (idUsuarioCodigo > 0 && nuevoEstatusUsuarioCodigo.HasValue)
+            {
+                var usuarioCodigo = await _context.UsuarioCodigoDescuento.FindAsync(idUsuarioCodigo);
+                if (usuarioCodigo == null)
+                    return NotFound("Asignación de usuario no encontrada.");
+
+                usuarioCodigo.Usado = nuevoEstatusUsuarioCodigo.Value;
+                _context.UsuarioCodigoDescuento.Update(usuarioCodigo);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("Estatus actualizado correctamente.");
+        }
+
+
 
     }
 }

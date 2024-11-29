@@ -16,7 +16,7 @@ public class EmailService
             email.To.Add(new MailboxAddress(destinatario, destinatario));
         }
 
-        email.Subject = "Respuesta a su queja";
+        email.Subject = "Respuesta a su queja/comentario";
         email.Body = new TextPart("plain")
         {
             Text = mensaje

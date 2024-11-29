@@ -87,6 +87,11 @@ public partial class SalsaContext : DbContext
 
     public virtual DbSet<Queja> Quejas { get; set; }
 
+    public virtual DbSet<QuejasV2> QuejasV2 { get; set; }
+
+    public virtual DbSet<SeguimientoQueja> SeguimientoQueja { get; set; }
+
+
     public virtual DbSet<Cotizaciones> Cotizaciones { get; set; }
     public virtual DbSet<DetalleCotizacion> DetalleCotizaciones { get; set; }
     public virtual DbSet<vw_Cotizacion> VistaCotizaciones { get; set; }
@@ -995,7 +1000,51 @@ public partial class SalsaContext : DbContext
                 .HasForeignKey(q => q.IdUsuario)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-    
+
+        modelBuilder.Entity<QuejasV2>(entity =>
+        {
+            entity.HasKey(q => q.Id);
+            entity.Property(q => q.Contenido).IsRequired();
+            entity.Property(q => q.FechaCreacion).HasColumnType("datetime").IsRequired();
+            entity.Property(q => q.Estado).HasMaxLength(50).HasDefaultValue("Nueva");
+           
+
+            entity.HasOne(q => q.Usuario)
+                .WithMany(u => u.QuejasV2)
+                .HasForeignKey(q => q.IdUsuario)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(q => q.Seguimientos)
+                .WithOne(s => s.Queja)
+                .HasForeignKey(s => s.IdQueja)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SeguimientoQueja>(entity =>
+        {
+            entity.HasKey(s => s.IdSeguimiento);
+
+            entity.Property(s => s.Accion)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(s => s.Comentario)
+                .HasMaxLength(500);
+
+            entity.Property(s => s.FechaAccion)
+                .HasColumnType("datetime")
+                .IsRequired();
+
+            // Relación con QuejasV2
+            entity.HasOne(s => s.Queja)
+                .WithMany(q => q.Seguimientos)
+                .HasForeignKey(s => s.IdQueja)
+                .OnDelete(DeleteBehavior.Cascade);
+
+          
+        });
+
+
         modelBuilder.Entity<Ventum>(entity =>
         {
             entity.HasKey(e => e.IdVenta).HasName("PK__Venta__077D56146F550EF7");

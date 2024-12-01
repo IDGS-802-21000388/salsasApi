@@ -95,6 +95,14 @@ namespace SalsasAPI.Controllers
                     {
                         var emailService = new EmailService();
                         await emailService.EnviarCorreoHtml(usuario.Correo, "Nueva Promoción Disponible", mensajeHtml, "images/logo_Salsa_Reni-removebg.png");
+
+                        var emailMessage = new EmailMessage
+                        {
+                            Email = usuario.Correo,
+                            Mensaje = $"{codigo.Codigo} - {codigo.Descripcion}",
+                            FechaCreacion = DateTime.Now
+                        };
+                        _context.EmailMessages.Add(emailMessage);
                     }
                     catch (Exception ex)
                     {
@@ -106,6 +114,7 @@ namespace SalsasAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok("Código asignado a los usuarios seleccionados y correos enviados.");
         }
+
 
         private string GenerarMensajePromocionHtml(CodigoDescuento codigo, Usuario usuario)
         {

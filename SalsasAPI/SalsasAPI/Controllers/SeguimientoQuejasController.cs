@@ -93,14 +93,38 @@ namespace SalsasAPI.Controllers
             // Cambiar el estado de la queja a "En Proceso"
             queja.Estado = "En Proceso";
 
-            // Guardar los cambios
-            await _context.SaveChangesAsync();
+            // Crear registro en la tabla EmailMessage
+            var emailMessage = new EmailMessage
+            {
+                Email = queja.Usuario.Correo,
+                Mensaje = $"{seguimientoDTO.Accion} - {seguimientoDTO.Comentario}",
+                FechaCreacion = DateTime.Now // Se puede omitir ya que la tabla tiene DEFAULT GETDATE()
+            };
+            _context.EmailMessages.Add(emailMessage);
+
+            // Guardar los cambios en la base de datos
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar en la base de datos: {ex.Message}");
+            }
 
             // Enviar correo al usuario con los detalles del seguimiento
             var destinatarios = new List<string> { queja.Usuario.Correo };
             var mensaje = $"Estimado/a {queja.Usuario.Nombre},\n\nSe ha agregado un nuevo seguimiento a su queja o comentario:\nAcción: {seguimientoDTO.Accion}\nComentario: {seguimientoDTO.Comentario}\n\nSaludos,\nSalsas Reni";
 
-            await _emailService.EnviarCorreo(destinatarios, mensaje);
+            try
+            {
+                await _emailService.EnviarCorreo(destinatarios, mensaje);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar el correo: {ex.Message}");
+                // Podrías manejar este error según lo que consideres necesario
+            }
 
             return Ok(nuevoSeguimiento);
         }
@@ -155,6 +179,50 @@ namespace SalsasAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { Message = "La queja ha sido marcada como Resuelta." });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearQueja([FromBody] QuejasV2 nuevaQueja)
+        {
+            if (nuevaQueja == null || string.IsNullOrWhiteSpace(nuevaQueja.Contenido) || nuevaQueja.IdUsuario <= 0)
+            {
+                return BadRequest("Datos de la queja inválidos.");
+            }
+
+            try
+            {
+                // Establecer valores iniciales para la nueva queja
+                nuevaQueja.FechaCreacion = DateTime.Now;
+                nuevaQueja.Estado = "Nueva";
+
+                // Insertar en la tabla QuejasV2
+                _context.QuejasV2.Add(nuevaQueja);
+
+                // Crear un registro correspondiente en la tabla Quejas
+                var queja = new Queja
+                {
+                    Contenido = nuevaQueja.Contenido,
+                    FechaCreacion = nuevaQueja.FechaCreacion,
+                    Estado = nuevaQueja.Estado,
+                    IdUsuario = nuevaQueja.IdUsuario,
+                    Respuesta = null, // Inicialmente sin respuesta
+                    FechaRespuesta = null // Inicialmente sin fecha de respuesta
+                };
+
+                _context.Quejas.Add(queja);
+
+                // Guardar los cambios en ambas tablas
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Queja creada exitosamente.", QuejaV2 = nuevaQueja, Queja = queja });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear la queja");
+                return StatusCode(500, "Ocurrió un error al procesar tu solicitud.");
+            }
+        }
+
+
 
     }
 }

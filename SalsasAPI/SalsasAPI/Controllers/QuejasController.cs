@@ -76,6 +76,24 @@ namespace SalsasAPI.Controllers
                 return BadRequest("El usuario no tiene un correo asociado.");
             }
 
+            var emailMessage = new EmailMessage
+            {
+                Email = queja.Usuario.Correo,
+                Mensaje = $"Respuesta a la queja: {respuesta}",
+                FechaCreacion = DateTime.Now // Se puede omitir ya que la tabla tiene DEFAULT GETDATE()
+            };
+            _context.EmailMessages.Add(emailMessage);
+
+            // Guardar cambios en la base de datos
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar en la base de datos: {ex.Message}");
+            }
+
             var destinatarios = new List<string> { queja.Usuario.Correo };
             var mensaje = $"Estimado/a {queja.Usuario.Nombre},\n\nSu queja ha sido respondida:\n{respuesta}\n\nSaludos,\nSalsas Reni";
 
